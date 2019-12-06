@@ -1,0 +1,16 @@
+﻿<Window x:Name="wndDay2A" x:Class="Day2a.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Day2a"
+        mc:Ignorable="d"
+        Title="Day 2a" Height="450" Width="800">
+    <Grid>
+        <TextBox x:Name="tbInput" HorizontalAlignment="Left" Height="40" TextWrapping="Wrap" Text="Enter program here..." VerticalAlignment="Top" Width="782" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+        <Button x:Name="btnRun" Content="Run Program" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="3,45,0,0" Click="BtnRun_Click"/>
+        <TextBox x:Name="tbOutput" HorizontalAlignment="Left" Height="40" TextWrapping="Wrap" Text="Result..." VerticalAlignment="Top" Width="782" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto" Margin="0,70,0,0"/>
+        <CheckBox x:Name="cb1202Error" Content="Fix 1202 error?" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="98,45,0,0" />
+
+    </Grid>
+</Window>

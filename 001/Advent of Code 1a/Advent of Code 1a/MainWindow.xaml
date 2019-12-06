@@ -1,0 +1,18 @@
+﻿<Window x:Class="Advent_of_Code_1a.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Advent_of_Code_1a"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button x:Name="button" Content="Calculate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="677,92,0,0" Click="Button_Click"/>
+        <TextBox x:Name="resultsTextBox" HorizontalAlignment="Left" Height="23" Margin="657,55,0,0" TextWrapping="Wrap" Text="Result..." VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="inputTextBox" HorizontalAlignment="Left" Height="363" Margin="40,17,0,0" TextWrapping="Wrap" Text="Paste input here..." VerticalAlignment="Top" Width="181" AcceptsReturn="True"/>
+        <TextBox x:Name="progressTextBox" HorizontalAlignment="Left" Height="363" Margin="239,17,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="402"/>
+        <TextBlock x:Name="tbFuelForFuelResult" HorizontalAlignment="Left" Margin="666,152,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="22" Width="100"/>
+        <Button x:Name="calcFuelForFuel" Content="Calc Fuel For Fuel" HorizontalAlignment="Left" Margin="657,195,0,0" VerticalAlignment="Top" Width="120" Click="CalcFuelForFuel_Click"/>
+
+    </Grid>
+</Window>
