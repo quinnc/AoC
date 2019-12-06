@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -43,17 +44,19 @@ namespace Day4.Calculators
             return true;
         }
 
-        List<int> matches = new List<int>();
+        ConcurrentBag<int> matches = new ConcurrentBag<int>();
 
-        public IReadOnlyList<int> Matches => matches;
+        public IReadOnlyList<int> Matches => matches.ToArray();
 
         public override string ToString()
         {
             string s = "";
 
+            s = $"Found {matches.Count} possible passwords:" + Environment.NewLine;
+
             foreach (int m in matches)
             {
-                s = m.ToString() + Environment.NewLine;
+                s += m.ToString() + Environment.NewLine;
             }
 
             return s;
