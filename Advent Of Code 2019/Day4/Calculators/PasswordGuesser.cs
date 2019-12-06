@@ -9,19 +9,45 @@ namespace Day4.Calculators
     {
         public void Guess(int bottom, int top)
         {
-            Parallel.For(bottom, top + 1,
-                currGuess =>
-                {
-                    string guessAsStr = currGuess.ToString();
-                    if (IsIncreasing(guessAsStr) && HasDouble(guessAsStr))
+            if (bottom > 1000 & top > 1000)
+            {
+                int newBottom = bottom / 1000;
+                int newTop = top / 1000;
+                Parallel.For(newBottom, newTop,
+                    currGuess =>
                     {
-                        matches.Add(currGuess);
-                    }
-                });
+                        int full = currGuess * 1000;
+                        for (int i = 0; i < 1000; i++)
+                        {
+                            int curr = i + full;
+                            if (curr < bottom)
+                                continue;
+                            if (curr > (top + 1))
+                                break;
 
+                            string guessAsStr = curr.ToString();
+                            if (IsIncreasing(guessAsStr) && HasDouble(guessAsStr))
+                            {
+                                matches.Add(curr);
+                            }
+                        }
+                    });
+            }
+            else
+            {
+                Parallel.For(bottom, top + 1,
+                    currGuess =>
+                    {
+                        string guessAsStr = currGuess.ToString();
+                        if (IsIncreasing(guessAsStr) && HasDouble(guessAsStr))
+                        {
+                            matches.Add(currGuess);
+                        }
+                    });
+            }
         }
 
-        private bool HasDouble(string currGuess)
+        private bool HasDoublePartA(string currGuess)
         {
             for (int i = 1; i < currGuess.Length; i++)
             {
@@ -30,6 +56,38 @@ namespace Day4.Calculators
             }
 
             return false;
+        }
+
+        private bool HasDouble(string currGuess)
+        {
+            bool inMatch = false;
+            bool foundJustPair = false;
+
+            for (int i = 1; i < currGuess.Length; i++)
+            {
+                if (currGuess[i - 1] == currGuess[i])
+                {
+                    if (!inMatch)
+                    {
+                        inMatch = true;
+                        foundJustPair = true;
+                    }
+                    else
+                    {
+                        foundJustPair = false;
+                    }
+                }
+                else
+                {
+                    if (foundJustPair)
+                        return true;
+
+                    inMatch = false;
+
+                }
+            }
+
+            return foundJustPair;
         }
 
         private bool IsIncreasing(string currGuess)
