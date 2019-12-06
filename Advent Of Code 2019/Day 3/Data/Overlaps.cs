@@ -6,9 +6,15 @@ namespace Day_3.Data
 
     class Overlaps
     {
+        void Reset()
+        {
+            overlaps.Clear();
+            distances.Clear();
+        }
 
         public void Find(WireRoute w1, WireRoute w2)
         {
+            Reset();
 
             foreach (var pointIn2 in w1.Route)
             {
@@ -27,7 +33,16 @@ namespace Day_3.Data
 
         public override string ToString()
         {
-            return base.ToString();
+            //return base.ToString();
+
+            string outStr = "";
+            foreach(var overlap in overlaps)
+            {
+                outStr += $" {overlap.Item1},{overlap.Item2} ; ";
+            }
+
+            return outStr;
+
         }
 
         private XYPairList overlaps = new XYPairList();
@@ -35,6 +50,8 @@ namespace Day_3.Data
 
         public void CalcDistances()
         {
+            distances.Clear();
+
             foreach (var overlap in overlaps)
             {
                 distances.Add(Math.Abs(overlap.Item1) + Math.Abs(overlap.Item2));

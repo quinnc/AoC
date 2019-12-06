@@ -21,6 +21,7 @@ namespace Day_3
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+
             wire1.MakeRoute(tbWire1.Text);
             wire2.MakeRoute(tbWire2.Text);
 

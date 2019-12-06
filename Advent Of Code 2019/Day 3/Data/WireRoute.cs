@@ -8,25 +8,31 @@ namespace Day_3.Data
 {
     class WireRoute
     {
+        void Reset()
+        {
+            route.Clear();
+        }
         public bool MakeRoute(string line)
         {
+            Reset();
             var steps = SplitLine(line);
 
             int currX = 0;
             int currY = 0;
             route.Clear();
+            bool ok = true;
 
             foreach (var step in steps)
             {
-                var ok = SplitStep(step, out char dir, out int count);
+                ok &= SplitStep(step, out char dir, out int count);
                 if (!ok)
-                    return false;
-                ok = Walk(currX, currY, dir, count);
+                    continue;
+                ok &= Walk(ref currX, ref currY, dir, count);
             }
-            return true;
+            return ok;
         }
 
-        private bool Walk(int currX, int currY, char dir, int count)
+        private bool Walk(ref int currX, ref int currY, char dir, int count)
         {
             for (int i = 0; i < count; i++)
             {
@@ -61,6 +67,14 @@ namespace Day_3.Data
 
         private bool SplitStep(string step, out char dir, out int count)
         {
+            dir = 'U';
+            count = 0;
+
+            if (step.Length < 2)
+            {
+                MessageBox.Show($"String was too small: {step}");
+                return false;
+            }
             dir = step[0];
 
             var countStr = step.Substring(1);
