@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Day_3.Data
 {
 
     class Overlaps
     {
-        void Reset()
+        protected void Reset()
         {
             overlaps.Clear();
             distances.Clear();
         }
 
-        public void Find(WireRoute w1, WireRoute w2)
+        public virtual void Find(WireRoute w1, WireRoute w2)
         {
             Reset();
 
@@ -45,8 +46,8 @@ namespace Day_3.Data
 
         }
 
-        private XYPairList overlaps = new XYPairList();
-        private List<int> distances = new List<int>();
+        protected XYPairList overlaps = new XYPairList();
+        protected List<int> distances = new List<int>();
 
         public void CalcDistances()
         {
@@ -84,6 +85,26 @@ namespace Day_3.Data
 
             x = overlaps[idxShortest].Item1;
             y = overlaps[idxShortest].Item2;
+        }
+    }
+
+    class OverlapsWithSteps : Overlaps
+    {
+        public override void Find (WireRoute w1, WireRoute w2)
+        {
+
+            Reset();
+
+            Parallel.For(0, w1.Route.Count,
+                index =>
+            {
+                var w2Index = w2.Route.IndexOf(w1.Route[index]);
+
+                if (w2Index >= 0)
+                {
+                    overlaps.Add(new Tuple<int, int>(index+1, w2Index+1));
+                }
+            });
         }
     }
 }

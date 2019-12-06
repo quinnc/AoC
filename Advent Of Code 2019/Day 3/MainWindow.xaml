@@ -20,21 +20,22 @@
         </Grid.RowDefinitions>
 
         <Label Content="Wire 1" Grid.Row="0" Grid.Column="0" />
-        <TextBox Name="tbWire1" Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50"/>
+        <TextBox Name="tbWire1" Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50" TextWrapping="Wrap"/>
 
         <Label Content="Wire 2" Grid.Row="1" Grid.Column="0" />
-        <TextBox Name="tbWire2" Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50"/>
+        <TextBox Name="tbWire2" Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50" TextWrapping="Wrap"/>
 
         <StackPanel FlowDirection="LeftToRight" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
         <Button Name="btnOverlaps" Content="Find overlaps" Width="Auto" Height="30" Click="Button_Click"/>
         <Button Name="btnFindShortest" Content="Find shortest overlap to home" Width="Auto" Height="30" Click="BtnFindShortest_Click"/>
+         <Button Name="btnStepToOverlaps" Content="Find steps to overlaps (day 3b)" Width="Auto" Height="30" Click="BtnStepToOverlaps_Click"/>
         </StackPanel>
         
         <Label Content="Overlaps" Grid.Row="3" Grid.Column="0" />
-        <TextBox Name="tbOverlaps" Grid.Row="3" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50"/>
+        <TextBox Name="tbOverlaps" Grid.Row="3" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50" TextWrapping="Wrap"/>
 
         <Label Content="Shortest" Grid.Row="4" Grid.Column="0" />
-        <TextBox Name="tbShortestDist" Grid.Row="4" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50"/>
+        <TextBox Name="tbShortestDist" Grid.Row="4" Grid.Column="1" VerticalScrollBarVisibility="Visible" Height="50" TextWrapping="Wrap"/>
 
     </Grid>
 </Window>
