@@ -1,37 +1,46 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace Day5.Compiler
 {
-    class CodeRunner
+    class CodeRunner: INotifyPropertyChanged
     {
         private const string HALT_CMD = "99";
         private const string ADD_CMD = "01";
         private const string MULT_CMD = "02";
         private const string STOR_CMD = "03";
         private const string DUMP_CMD = "04";
+        private const string JIT_CMD = "05"; // jump if true
+        private const string JIF_CMD = "06"; // jump if false
+        private const string LT_CMD = "07"; // if a < b, set c=1
+        private const string EQ_CMD = "08"; // if a==b, set c=1
 
         private const char ADDR = '0';
         private const char IMMED = '1';
-        
 
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public bool Run(string code, string _input, out string _output)
+        // This method is called by the Set accessor of each property.  
+        // The CallerMemberName attribute that is applied to the optional propertyName  
+        // parameter causes the property name of the caller to be substituted as an argument.  
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
+        public bool Run()
+        {
             int execptr = 0;
-
-            data = Regex.Split(code, ",|\r\n|\r|\n");
-            externalIO = _input;
 
             int szData = data.Length;
             bool ok = false;
-            int cmdSize;
 
             while (execptr < szData && data[execptr] != HALT_CMD)
             {
-                ok = Command(execptr, out cmdSize);
+                ok = Command(execptr, out int cmdSize);
                 if (!ok)
                 {
                     MessageBox.Show($"command failed! {execptr}");
@@ -41,21 +50,25 @@ namespace Day5.Compiler
                 execptr += cmdSize;
             }
 
-            _output = output;
             return ok;
         }
 
-        private bool Command(int curr, out int size)
+        private bool Command(int curr, out int jumpAmt)
         {
-
             string cmdStr = data[curr];
             int cmdInt = -1;
+
+            if (cmdStr.Length == 0)
+            {
+                jumpAmt = 1;
+                return true;
+            }
 
             bool ok = Int32.TryParse(cmdStr, out cmdInt);
 
             if (!ok)
             {
-                size = 0;
+                jumpAmt = 0;
                 return false;
             }
 
@@ -66,7 +79,6 @@ namespace Day5.Compiler
             char modeParam2 = cmdStr[2];
             char modeParam1 = cmdStr[3];
             string opcode = cmdStr.Substring(4);
-            size = 1000;
 
 
             switch (opcode)
@@ -80,8 +92,11 @@ namespace Day5.Compiler
                         int sum = input1 + input2;
 
                         ok = SetOutput(curr, 3, modeParam3, sum);
-                        size = 4;
+                        jumpAmt = 4;
                     }
+                    else
+                        jumpAmt = 1000;
+
                 }
                 break;
 
@@ -94,39 +109,134 @@ namespace Day5.Compiler
                         int sum = input1 * input2;
 
                         ok = SetOutput(curr, 3, modeParam3, sum);
-                        size = 4;
+                        jumpAmt = 4;
                     }
+                    else
+                        jumpAmt = 1000;
                 }
                 break;
 
                 case STOR_CMD:
                 {
-                    ok = SetOutput(curr, 1, modeParam1, externalIO);
+                    ok = SetOutput(curr, 1, modeParam1, externalInput);
+                    jumpAmt = 2;
                     break;
                 }
 
                 case DUMP_CMD:
                 {
-
-                    ok = GetInput(curr+1, modeParam1, out int externalInt);
-                    externalIO = externalInt.ToString();
+                    ok = GetInputs(curr, 1, modeParam1, out int externalInt, modeParam2, out int _);
+                    externalOutput = externalInt.ToString();
+                    NotifyPropertyChanged("ExternalOutput");
+                    jumpAmt = 2;
                     break;
                 }
 
+                case JIT_CMD:
+                {
+                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    if (ok)
+                    {
+                        if (input1 != 0)
+                        {
+                            jumpAmt = input2 - curr;
+                        }
+                        else
+                        {
+                            jumpAmt = 3;
+                        }
+
+                    }
+                    else
+                    {
+                        jumpAmt = 1;
+                    }
+                    break;
+                }
+
+                case JIF_CMD:
+                {
+                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    if (ok)
+                    {
+                        if (input1 == 0)
+                        {
+                            jumpAmt = input2 - curr;
+                        }
+                        else
+                        {
+                            jumpAmt = 3;
+                        }
+
+                    }
+                    else
+                    {
+                        jumpAmt = 1;
+                    }
+                    break;
+                }
+
+                case LT_CMD:
+                {
+                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    if (ok)
+                    {
+                        if (input1 < input2)
+                        {
+                            ok = SetOutput(curr, 3, modeParam3, "1");
+                        }
+                        else
+                        {
+                            ok = SetOutput(curr, 3, modeParam3, "0");
+                        }
+
+                        jumpAmt = 4;
+                    }
+                    else
+                    {
+                        jumpAmt = 1;
+                    }
+                    break;
+                }
+
+                case EQ_CMD:
+                {
+                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    if (ok)
+                    {
+                        if (input1 == input2)
+                        {
+                            ok = SetOutput(curr, 3, modeParam3, "1");
+                        }
+                        else
+                        {
+                            ok = SetOutput(curr, 3, modeParam3, "0");
+                        }
+
+                        jumpAmt = 4;
+                    }
+                    else
+                    {
+                        jumpAmt = 1;
+                    }
+                    break;
+                }
 
                 case HALT_CMD:
                     // code done case
                     MessageBox.Show($"Found code 99 at pos {curr}.");
+                    jumpAmt = 1;
+                    ok = true;
                     break;
 
                 default:
                     MessageBox.Show($"Unknown instruction {data[curr]}");
+                    jumpAmt = 1;
+                    ok = false;
                     break;
-
             }
 
-
-            return false;
+            return ok;
         }
 
         private bool SetOutput(int curr, int paramOffset, char mode, int val)
@@ -138,20 +248,21 @@ namespace Day5.Compiler
         private bool SetOutput(int curr, int paramOffset, char mode, string val)
         {
             bool ok = false;
-     
+
             switch (mode)
             {
                 case ADDR:
                 {
                     int address = 0;
-                    ok = Int32.TryParse(data[curr+paramOffset], out address);
+                    ok = Int32.TryParse(data[curr + paramOffset], out address);
 
                     if (ok)
                         if (address < data.Length)
                         {
                             ok = true;
-                            data[address] = val; ;
-                            }
+                            //data[address] = val;
+                            SetData(address, val);
+                        }
                         else
                             ok = false;
                     break;
@@ -160,7 +271,8 @@ namespace Day5.Compiler
                 case IMMED:
                 {
                     ok = true;
-                    data[curr + paramOffset] = val;
+                    //data[curr + paramOffset] = val;
+                    SetData(curr + paramOffset, val);
                     break;
                 }
 
@@ -191,7 +303,7 @@ namespace Day5.Compiler
                 ok = GetInput(curr + 1, modeParam1, out input1);
 
             if (ok && numParams >= 2)
-                ok = GetInput(curr + 2, modeParam1, out input1);
+                ok = GetInput(curr + 2, modeParam2, out input2);
 
             return ok;
         }
@@ -232,9 +344,24 @@ namespace Day5.Compiler
             return ok;
         }
 
-        private string[] data;
-        private string externalIO = "TBD";
-        private readonly string output = "FAIL";
+        private string[] data = new string[] {"99"};
+        private void SetData(int address, string val)
+        {
+            if (address >= data.Length)
+            {
+                MessageBox.Show($"not a valid address {address}");
+                return;
+            }
+
+            if (data[address] == val)
+                return;
+
+            data[address] = val;
+            NotifyPropertyChanged("Code");
+        }
+
+        private string externalInput = "unset";
+        private string externalOutput = "unset";
 
 
         private bool GetAddresses(int currpos, int numParams, out int input1loc, out int input2loc, out int outputloc)
@@ -262,6 +389,26 @@ namespace Day5.Compiler
 
             return ok;
         }
+
+        public string Code
+        {
+            get => string.Join(", ", data);
+            set
+            {
+                data = Regex.Split(value, ",|\r\n|\r|\n");
+            }
+        }
+
+        public string ExternalInput
+        {
+            get => externalInput;
+            set
+            {
+                externalInput = value;
+            }
+        }
+
+        public string ExternalOutput => externalOutput;
 
     }
 }

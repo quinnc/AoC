@@ -22,20 +22,18 @@ namespace Day5
     /// </summary>
     public partial class MainWindow : Window
     {
+        CodeRunner c = new CodeRunner();
+
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext= c;
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            CodeRunner c = new CodeRunner();
-
-            string outVal = "";
-            c.Run(tbCode.Text, tbCodeInput.Text, out outVal);
-
-            tbCodeOutput.Text = outVal;
-
+            c.Run();
         }
     }
 }
