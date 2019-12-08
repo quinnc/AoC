@@ -11,7 +11,15 @@ namespace Day6.Model
 
         public int Init(string inputs)
         {
+            MakeMap(inputs);
+            GetAllOrbits(com);
 
+            int sumAllPaths = OrbitAndSuborbitDepths(com);
+            return sumAllPaths;
+        }
+
+        private void MakeMap(string inputs)
+        {
             var lines = Regex.Split(inputs, "\r\n|\r|\n"); // ("\n|\r|\r\n");
 
             foreach (var line in lines)
@@ -24,33 +32,10 @@ namespace Day6.Model
                     continue;
                 }
 
-
-                //string orbittee = orbitDef[0];
-                //string orbitter = orbitDef[1];
-
-
-
-                //Planet pOrbittee = new Planet();
-                //pOrbittee.Name = orbittee;
-
-                //Planet pOrbitter = new Planet();
-                //pOrbitter.Name = orbitter;
-                //pOrbitter.OrbitsAround = orbittee;
-
-                //// find the orbittee in the 
-                ///
-
-
-
                 // put the pairs into a list
                 map.Add(new Tuple<string, string>(orbitDef[0], orbitDef[1]));
 
             }
-
-            GetAllOrbits(com);
-
-            int sumAllPaths = OrbitAndSuborbitDepths(com);
-            return sumAllPaths;
         }
 
         private int OrbitAndSuborbitDepths(Planet planet)
@@ -68,7 +53,7 @@ namespace Day6.Model
         private List<Tuple<string, string>> map = new List<Tuple<string, string>>();
 
 
-        private void GetAllOrbits (Planet currPlanet)
+        private void GetAllOrbits(Planet currPlanet)
         {
 
             var currOrbit = map.Find(x => x.Item1 == currPlanet.Name);
@@ -85,7 +70,70 @@ namespace Day6.Model
 
                 currOrbit = map.Find(x => x.Item1 == currPlanet.Name);
             }
-
         }
+
+
+        public int OrbitalHops(string src, string dest)
+        {
+            List<string> srcAncestry = new List<string>();
+            List<string> destAncestry = new List<string>();
+            var srcFound = GetParents(src, com, srcAncestry);
+            var destFound = GetParents(dest, com, destAncestry);
+
+            if (!srcFound || !destFound)
+            {
+                MessageBox.Show("either didn't find the src or the dest!");
+                return -1;
+            }
+
+            //var lastCommon = GetLastCommonAncenstor(srcParentList, destParentList);
+
+            //return OrbitDistance(srcParentList, lastCommon) + OrbitDistance(destParentList, lastCommon);
+
+
+            int minLength = Math.Min(srcAncestry.Count, destAncestry.Count);
+            bool stillMatch = true;
+            int index = 0;
+
+            while (stillMatch && index < minLength)
+            {
+                if (srcAncestry[index] != destAncestry[index])
+                    stillMatch = false;
+                else
+                    index++;
+            }
+
+            return (srcAncestry.Count - index) + (destAncestry.Count - index);
+        }
+
+        private bool GetParents(string src, Planet curr, List<string> ancestry)
+        {
+            if (curr.Name == src)
+            {
+                // start the list
+
+                ancestry.Add(src);
+                return true;
+            }
+
+            // else
+            bool found = false;
+
+            foreach (var childPlanet in curr.Orbitters)
+            {
+                found = GetParents(src, childPlanet, ancestry);
+
+                if (found)
+                {
+                    ancestry.Add(childPlanet.Name);
+                    break;
+                }
+                // else loop to the next child
+
+            }
+
+            return found;
+        }
+
     }
 }

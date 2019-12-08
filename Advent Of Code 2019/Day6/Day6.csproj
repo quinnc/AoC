@@ -69,7 +69,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\Orbits.cs" />
     <Compile Include="Model\Planet.cs" />
     <Compile Include="Model\SolarSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
