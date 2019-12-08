@@ -33,7 +33,11 @@ namespace Day6
             int total = sys.Init(tbCode.Text);
 
             tbMatches.Text = total.ToString();
-            
+
+            int dist = sys.OrbitalHops("YOU", "SAN");
+
+            tbMatches.Text += Environment.NewLine + dist.ToString();
+
         }
     }
 }

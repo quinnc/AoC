@@ -91,6 +91,9 @@ namespace Day6.Model
             //return OrbitDistance(srcParentList, lastCommon) + OrbitDistance(destParentList, lastCommon);
 
 
+            srcAncestry.Reverse();
+            destAncestry.Reverse();
+
             int minLength = Math.Min(srcAncestry.Count, destAncestry.Count);
             bool stillMatch = true;
             int index = 0;
@@ -110,9 +113,6 @@ namespace Day6.Model
         {
             if (curr.Name == src)
             {
-                // start the list
-
-                ancestry.Add(src);
                 return true;
             }
 
@@ -125,13 +125,17 @@ namespace Day6.Model
 
                 if (found)
                 {
-                    ancestry.Add(childPlanet.Name);
+                    //ancestry.Add(childPlanet.Name);
                     break;
                 }
                 // else loop to the next child
 
             }
 
+            if (found)
+            {
+                ancestry.Add(curr.Name);
+            }
             return found;
         }
 
