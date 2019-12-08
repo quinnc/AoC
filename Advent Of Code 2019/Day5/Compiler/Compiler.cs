@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace Day5.Compiler
 {
-    class Compiler
+    class CodeRunner
     {
         private const string HALT_CMD = "99";
         private const string ADD_CMD = "01";

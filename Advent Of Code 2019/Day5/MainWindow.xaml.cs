@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Day5.Compiler;
+
 namespace Day5
 {
     /// <summary>
@@ -23,6 +25,17 @@ namespace Day5
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CodeRunner c = new CodeRunner();
+
+            string outVal = "";
+            c.Run(tbCode.Text, tbCodeInput.Text, out outVal);
+
+            tbCodeOutput.Text = outVal;
+
         }
     }
 }
