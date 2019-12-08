@@ -16,11 +16,12 @@ namespace Day6.Model
 
             foreach (var line in lines)
             {
-                var orbitDef = Regex.Split(line, ")");
+                var orbitDef = Regex.Split(line, "\\)");
 
                 if (orbitDef.Length != 2)
                 {
                     MessageBox.Show($"didn't split line into 2 part! [{line}]");
+                    continue;
                 }
 
 
