@@ -9,20 +9,20 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="200" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
         <Label Grid.Column="0" Grid.Row="0" Content="IntCode to execute" />
-        <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Path=Code,Mode=OneWayToSource}"
+        <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" 
                  VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
 
         <Button Grid.Column="0" Grid.Row="2" Content="Run..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
-        <TextBox Name="tbMatches" Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Visible" TextWrapping="Wrap" AcceptsReturn="True" Grid.ColumnSpan="2" Text="{Binding Path=Code,Mode=OneWay}" IsEnabled="False" />
+        <TextBox Name="tbMatches" Grid.Row="2" Grid.Column="1" 
+                 VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap"/>
 
     </Grid>
 </Window>

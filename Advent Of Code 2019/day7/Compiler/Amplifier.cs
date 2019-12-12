@@ -20,32 +20,46 @@ namespace day7.Compiler
 
         //ConcurrentBag<AmplifyResult> results;
         ConcurrentBag<int> _results = new ConcurrentBag<int>();
+        string savedCode;
 
         public void Program (string code)
         {
-            foreach (var c in compilers)
+            savedCode = code;
+            //foreach (var c in compilers)
+            for (int i =- 0; i < 5; i++)
             {
-                c.Code = code;
+                compilers[i] = new CodeRunner();
+                compilers[i].Code = code;
             }
         }
 
         public string Execute()
         {
             SortedSet<int> inputs0 = new SortedSet<int> { 0, 1, 2, 3, 4 };
-            Parallel.ForEach(inputs0,
-                stage0input =>
-                {
-                    RunCurrentCompiler("0", stage0input, inputs0, 0);
-                });
+            //Parallel.ForEach(inputs0,
+            //    stage0input =>
+            //    {
+            //        RunCurrentCompiler("0", stage0input, inputs0, 0);
+            //    });
 
-            return string.Join (Environment.NewLine,_results.OrderBy(x => x));
+            string r = "";
+
+            for (var i=0; i < 5; i++)
+            {
+                r += RunCurrentCompiler("0", i, inputs0, 0) + Environment.NewLine;
+            }
+
+
+            //return string.Join (Environment.NewLine,_results.OrderBy(x => x));
+            return _results.OrderByDescending(x => x).FirstOrDefault().ToString();
         }
 
-        private void RunCurrentCompiler(string previousResult, int currentSetting, SortedSet<int> settingsList, int depth)
+        private string RunCurrentCompiler(string previousResult, int currentSetting, SortedSet<int> settingsList, int depth)
         {
             Debug.Assert(depth < compilers.Length);
 
-            compilers[depth].ExternalInput = new string[] { previousResult, currentSetting.ToString() };
+            compilers[depth].Code = savedCode;
+            compilers[depth].ExternalInput = new string[] { currentSetting.ToString(), previousResult };
             compilers[depth].Run();
 
             SortedSet<int> inputList = new SortedSet<int>(settingsList);
@@ -57,13 +71,16 @@ namespace day7.Compiler
                 bool ok = false;
                 ok = Int32.TryParse(compilers[depth].ExternalOutput, out finalout);
                 _results.Add(finalout);
-                return;  // when there is no more
+                return depth.ToString() + ":" + compilers[depth].ExternalOutput;  // when there is no more
             }
 
+            string ret = "";
             foreach (var nextStageInput in inputList)
             {
-                RunCurrentCompiler(compilers[depth].ExternalOutput, nextStageInput, inputList, depth + 1);
+                ret += RunCurrentCompiler(compilers[depth].ExternalOutput, nextStageInput, inputList, depth + 1) + Environment.NewLine;
             }
+
+            return ret;
         }
 
         

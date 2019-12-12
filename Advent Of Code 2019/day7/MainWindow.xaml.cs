@@ -34,6 +34,7 @@ namespace day7
 
             var r = amp.Execute();
 
+            tbMatches.Text = r;
         }
     }
 }

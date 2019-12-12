@@ -398,6 +398,8 @@ namespace day7.Compiler
             get => string.Join(", ", data);
             set
             {
+                currentInput = 0;
+                externalOutput = "-1";
                 data = Regex.Split(value, ",|\r\n|\r|\n");
             }
         }
