@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Day8
 {
@@ -42,6 +43,7 @@ namespace Day8
                 if (currZeros <= maxZeros)
                 {
                     maxZerosIndex = layerIdx;
+                    maxZeros = currZeros;
                 }
 
             }
@@ -58,6 +60,31 @@ namespace Day8
             }
 
             return currOnes * currTwos;
+        }
+
+        internal string Render ()
+        {
+            string mergedStr = "";
+
+
+            for (int i = 0; i < layers[0].Length; i++)
+            {
+                int depth = 0;
+
+                while ( depth < layers.Count && layers[depth][i] == '2')
+                {
+                    depth++;
+                }
+
+                Debug.Assert(depth < layers.Count);
+
+                mergedStr += (( layers[depth][i] == '0') ? ' ' : '*');
+                if (((i + 1) % 25) == 0)
+                    mergedStr += Environment.NewLine;
+
+            }
+
+            return mergedStr;
         }
     }
 }

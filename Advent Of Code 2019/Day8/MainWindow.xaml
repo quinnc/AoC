@@ -21,10 +21,10 @@
                  VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
 
         <StackPanel Grid.Column="0" Grid.Row="2" >
-            <Button Content="Run..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
-         
+            <Button Content="Check checksum..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
+            <Button Content="Decode..." Height="24" VerticalAlignment="Top" Click="Button_Click_1" />
         </StackPanel>
         <TextBox Name="tb1sMulti2s" Grid.Row="2" Grid.Column="1" 
-                 VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap"/>
+                 VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Courier New"/>
     </Grid>
 </Window>

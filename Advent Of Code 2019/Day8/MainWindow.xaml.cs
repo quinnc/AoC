@@ -33,5 +33,15 @@ namespace Day8
 
             tb1sMulti2s.Text = sifImage.Checkcode().ToString();
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            SIFImageParser sifImage = new SIFImageParser(tbCode.Text);
+
+            sifImage.Decode();
+
+
+            tb1sMulti2s.Text = sifImage.Render();
+        }
     }
 }
