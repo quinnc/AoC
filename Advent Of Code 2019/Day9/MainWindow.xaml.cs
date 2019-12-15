@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Day9.Compiler;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,19 @@ namespace Day9
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            ParallelCodeRunner pcr = new ParallelCodeRunner();
+            tbMatches.Text = "";
+            pcr.Code = tbCode.Text;
+            pcr.ExternalOutput = new System.Collections.Concurrent.BlockingCollection<string>();
+            pcr.ExternalInput.Add("1");
+            pcr.Run();
+            string outstr = string.Join("\n", pcr.ExternalOutput);
+
+            tbMatches.Text = "result = \n" + outstr;
         }
     }
 }
