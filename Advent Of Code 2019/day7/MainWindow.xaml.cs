@@ -36,5 +36,15 @@ namespace day7
 
             tbMatches.Text = r;
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            FeedbackAmplifier famp = new FeedbackAmplifier();
+
+            famp.Program(tbCode.Text);
+
+            var r = famp.Execute();
+            tbMatches.Text = r;
+        }
     }
 }

@@ -63,8 +63,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Compiler\Amplifier.cs" />
     <Compile Include="Compiler\Compiler.cs" />
+    <Compile Include="Compiler\FeedbackAmplifier.cs" />
+    <Compile Include="Compiler\Amplifier.cs" />
+    <Compile Include="Compiler\ParallelCompiler.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

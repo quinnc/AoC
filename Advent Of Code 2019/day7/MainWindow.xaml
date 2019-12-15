@@ -20,7 +20,10 @@
         <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" 
                  VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
 
-        <Button Grid.Column="0" Grid.Row="2" Content="Run..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
+        <StackPanel Grid.Column="0" Grid.Row="2" >
+        <Button Content="Run..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
+            <Button Content="Run feedback..." Height="24" VerticalAlignment="Top" Click="Button_Click_1" />
+        </StackPanel>
         <TextBox Name="tbMatches" Grid.Row="2" Grid.Column="1" 
                  VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap"/>
 
