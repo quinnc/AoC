@@ -38,5 +38,18 @@ namespace Day9
 
             tbMatches.Text = "result = \n" + outstr;
         }
+
+        private void RunBoostBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ParallelCodeRunner pcr = new ParallelCodeRunner();
+            tbMatches.Text = "";
+            pcr.Code = tbCode.Text;
+            pcr.ExternalOutput = new System.Collections.Concurrent.BlockingCollection<string>();
+            pcr.ExternalInput.Add("2");
+            pcr.Run();
+            string outstr = string.Join("\n", pcr.ExternalOutput);
+
+            tbMatches.Text = "result = \n" + outstr;
+        }
     }
 }
