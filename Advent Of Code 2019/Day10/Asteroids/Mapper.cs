@@ -190,7 +190,7 @@ namespace Day10.Asteroids
                     {
                         bool foundAster = false;
                         BlastThem(x, y, skipX, skipY, visited, vaporizedMap, vaporedList, ref foundAster);
-                        blasted &= foundAster;
+                        blasted |= foundAster;
                     }
 
                 // for down & right
@@ -199,7 +199,7 @@ namespace Day10.Asteroids
                     {
                         bool foundAster = false;
                         BlastThem(x, y, skipX, skipY, visited, vaporizedMap, vaporedList, ref foundAster);
-                        blasted &= foundAster;
+                        blasted |= foundAster;
                     }
 
                 // going left & down
@@ -208,7 +208,7 @@ namespace Day10.Asteroids
                     {
                         bool foundAster = false;
                         BlastThem(x, y, skipX, skipY, visited, vaporizedMap, vaporedList, ref foundAster);
-                        blasted &= foundAster;
+                        blasted |= foundAster;
                     }
 
                 // going left & up
@@ -217,7 +217,7 @@ namespace Day10.Asteroids
                     {
                         bool foundAster = false;
                         BlastThem(x, y, skipX, skipY, visited, vaporizedMap, vaporedList, ref foundAster);
-                        blasted &= foundAster;
+                        blasted |= foundAster;
                     }
 
                 if (!blasted)

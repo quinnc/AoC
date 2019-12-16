@@ -48,7 +48,7 @@ namespace Day10
 
             mapper.MakeVaporizeList(200, out int x, out int y);
 
-            tbBestLocation.Text = $"x = {best.x}, y = {best.y} val {x*100 + y}";
+            tbBestLocation.Text = $"200 blast: x = {x}, y = {y} val {x*100 + y}";
         }
     }
 }
