@@ -17,11 +17,12 @@
         </Grid.RowDefinitions>
 
         <Label Grid.Column="0" Grid.Row="0" Content="Map to analyze" />
-        <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" 
+        <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" FontFamily="Courier New"
                  VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
 
         <StackPanel Grid.Column="0" Grid.Row="2" >
             <Button Content="Run Find..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
+            <Button Content="Vaporize" Height="24" VerticalAlignment="Top" Name="btnVaporize" Click="BtnVaporize_Click"/>
         </StackPanel>
         <TextBox Name="tbBestLocation" Grid.Row="2" Grid.Column="1" 
                  VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap"/>

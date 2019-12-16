@@ -36,5 +36,19 @@ namespace Day10
 
             tbBestLocation.Text = $"x = {best.x}, y = {best.y} asteroids={best.numAsteroidsVisible}";
         }
+
+        private void BtnVaporize_Click(object sender, RoutedEventArgs e)
+        {
+
+            Mapper mapper = new Mapper();
+
+            mapper.SetMap(tbCode.Text);
+            mapper.FindSightLines();
+            mapper.GetMostVisibile(out VisibleAsteroidsFrom best);
+
+            mapper.MakeVaporizeList(200, out int x, out int y);
+
+            tbBestLocation.Text = $"x = {best.x}, y = {best.y} val {x*100 + y}";
+        }
     }
 }
