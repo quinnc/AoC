@@ -174,7 +174,7 @@ namespace Day10.Asteroids
             y = best.y;
 
             // each time we vaporize an asteroid, add the x,y into here
-            List<Tuple<int, int>> vaporedList = new Stack<Tuple<int, int>>();
+            List<Tuple<int, int>> vaporedList = new List<Tuple<int, int>>();
 
             // if we blast an asteroid, set this to true as a safety
             bool blasted = false;
