@@ -212,8 +212,8 @@ namespace Day10.Asteroids
                     }
 
                 // going left & up
-                for (int skipY = 0; skipY < (maxY - y); skipY++)
-                    for (int skipX = 0; skipX < (maxX - x); skipX++)
+                for (int skipY = 0; skipY >= (-1 * y); skipY--)
+                    for (int skipX = 0; skipX >= (-1 * x); skipX--)
                     {
                         bool foundAster = false;
                         BlastThem(x, y, skipX, skipY, visited, vaporizedMap, vaporedList, ref foundAster);
@@ -231,12 +231,11 @@ namespace Day10.Asteroids
             lastX = -1;
             lastY = -1;
 
-            if (blasted)
-                if (vaporedList.Count >= maxBlasts)
-                {
-                    lastX = vaporedList[maxBlasts - 1].Item1;
-                    lastY = vaporedList[maxBlasts - 1].Item2;
-                }
+            if (vaporedList.Count >= maxBlasts)
+            {
+                lastX = vaporedList[maxBlasts - 1].Item1;
+                lastY = vaporedList[maxBlasts - 1].Item2;
+            }
 
         }
 
