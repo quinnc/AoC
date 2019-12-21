@@ -27,7 +27,7 @@ namespace Day11
 
             intcomp.ExternalOutput = tracker.Input;
             intcomp.Code = initcode;
-            intcomp.ExternalInput.Add(inp.ToString()s);
+            intcomp.ExternalInput.Add(inp.ToString());
 
             intcomp.RunInThread();
             tracker.RunInThread();
