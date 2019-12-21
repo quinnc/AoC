@@ -1,34 +1,45 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 
 namespace Day11
 {
-    class CodeRunner 
+    class CodeRunner
     {
-        private const string HALT_CMD = "99";
-        private const string ADD_CMD = "01";
-        private const string MULT_CMD = "02";
-        private const string STOR_CMD = "03";
-        private const string DUMP_CMD = "04";
-        private const string JIT_CMD = "05"; // jump if true
-        private const string JIF_CMD = "06"; // jump if false
-        private const string LT_CMD = "07"; // if a < b, set c=1
-        private const string EQ_CMD = "08"; // if a==b, set c=1
+        enum Commands
+        {
+            ADD = 1,
+            MULT,
+            STOR,
+            DUMP,
+            JIT,
+            JIF,
+            LT,
+            EQ,
+            REL,
+            HALT = 99
+        };
 
-        private const char ADDR = '0';
-        private const char IMMED = '1';
+        enum AddrModes
+        {
+            ADDR = 0,
+            IMMED = 1,
+            REL = 2
+        };
+
 
         private string[] data = null;
+        private Dictionary<Int64, Int64> ram = new Dictionary<long, long>();
 
-        private int currentInput = 0;
         protected BlockingCollection<string> externalInput = new BlockingCollection<string>();
         protected BlockingCollection<string> externalOutput = null;
+
+        private Int64 currentInput = 0;
+        private Int64 relativeOffset = 0;
 
         public BlockingCollection<string> ExternalInput => externalInput;
 
@@ -40,9 +51,9 @@ namespace Day11
 
         public bool Run()
         {
-            int execptr = 0;
+            Int64 execptr = 0;
 
-            int szData = data.Length;
+            Int64 szData = data.Length;
             bool ok = false;
 
             if (ExternalOutput == null)
@@ -57,17 +68,18 @@ namespace Day11
                 return false;
             }
 
+            string haltStr = Commands.HALT.ToString();
+            relativeOffset = 0;
+            Commands lastCommand = Commands.DUMP;
 
 
-            while (execptr < szData && data[execptr] != HALT_CMD)
+            while (execptr < szData && lastCommand != Commands.HALT)
             {
-                ok = Command(execptr, out int cmdSize);
+                ok = Command(execptr, out Int64 cmdSize, out lastCommand);
                 if (!ok)
                 {
                     Debugger.Break();
-                    //externalOutput = data.ToString();
                     throw new Exception($"command failed! position {execptr}");
-                    //break;
                 }
 
                 execptr += cmdSize;
@@ -82,16 +94,17 @@ namespace Day11
             set
             {
                 currentInput = 0;
-
+                relativeOffset = 0;
                 data = Regex.Split(value, ",|\r\n|\r|\n");
             }
         }
 
-
-        private bool Command(int curr, out int jumpAmt)
+        private bool Command(Int64 curr, out Int64 jumpAmt, out Commands foundCommand)
         {
             string cmdStr = data[curr];
-            int cmdInt = -1;
+            Int64 cmdInt = -1;
+
+            foundCommand = Commands.HALT;
 
             if (cmdStr.Length == 0)
             {
@@ -99,11 +112,11 @@ namespace Day11
                 return true;
             }
 
-            bool ok = Int32.TryParse(cmdStr, out cmdInt);
+            bool ok = Int64.TryParse(cmdStr, out cmdInt);
 
             if (!ok)
             {
-                jumpAmt = 0;
+                jumpAmt = 1;
                 return false;
             }
 
@@ -114,17 +127,29 @@ namespace Day11
             char modeParam2 = cmdStr[2];
             char modeParam1 = cmdStr[3];
             string opcode = cmdStr.Substring(4);
+            Int64 opcodeInt = 0;
 
+            ok = Int64.TryParse(opcode, out opcodeInt);
 
-            switch (opcode)
+            Commands opcodeCmd = (Commands)opcodeInt;
+
+            if (!ok)
             {
-                case ADD_CMD:
+                jumpAmt = 1;
+                return false;
+            }
+
+            foundCommand = opcodeCmd;
+
+            switch (opcodeCmd)
+            {
+                case Commands.ADD:
                 {
                     // addition case
-                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    ok = GetInputs(curr, 2, modeParam1, out Int64 input1, modeParam2, out Int64 input2);
                     if (ok)
                     {
-                        int sum = input1 + input2;
+                        Int64 sum = input1 + input2;
 
                         ok = SetOutput(curr, 3, modeParam3, sum);
                         jumpAmt = 4;
@@ -135,13 +160,13 @@ namespace Day11
                 }
                 break;
 
-                case MULT_CMD:
+                case Commands.MULT:
                 {
                     // multiple case
-                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    ok = GetInputs(curr, 2, modeParam1, out Int64 input1, modeParam2, out Int64 input2);
                     if (ok)
                     {
-                        int sum = input1 * input2;
+                        Int64 sum = input1 * input2;
 
                         ok = SetOutput(curr, 3, modeParam3, sum);
                         jumpAmt = 4;
@@ -151,18 +176,9 @@ namespace Day11
                 }
                 break;
 
-                case STOR_CMD:
+                case Commands.STOR:
                 {
                     // set address to current external input
-                    // if (currentInput >= externalInput.Length)
-                    if (externalInput.Count == 0)
-                    {
-                        //Debugger.Break();
-                        //throw new ArgumentOutOfRangeException("currentInput " + currentInput.ToString() + " > externalInput.Length " + externalInput.Length.ToString());
-                        // will block
-                    }
-
-
                     var val = externalInput.Take();
                     ok = SetOutput(curr, 1, modeParam1, val);
                     currentInput++;
@@ -170,7 +186,7 @@ namespace Day11
                     break;
                 }
 
-                case DUMP_CMD:
+                case Commands.DUMP:
                 {
 
                     if (externalOutput == null)
@@ -178,16 +194,16 @@ namespace Day11
                         Debugger.Break();
                     }
 
-                    ok = GetInputs(curr, 1, modeParam1, out int externalInt, modeParam2, out int _);
+                    ok = GetInputs(curr, 1, modeParam1, out Int64 externalInt, modeParam2, out Int64 _);
                     externalOutput.Add(externalInt.ToString());
                     //         NotifyPropertyChanged("ExternalOutput");
                     jumpAmt = 2;
                     break;
                 }
 
-                case JIT_CMD:
+                case Commands.JIT:
                 {
-                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    ok = GetInputs(curr, 2, modeParam1, out Int64 input1, modeParam2, out Int64 input2);
                     if (ok)
                     {
                         if (input1 != 0)
@@ -207,9 +223,9 @@ namespace Day11
                     break;
                 }
 
-                case JIF_CMD:
+                case Commands.JIF:
                 {
-                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    ok = GetInputs(curr, 2, modeParam1, out Int64 input1, modeParam2, out Int64 input2);
                     if (ok)
                     {
                         if (input1 == 0)
@@ -229,9 +245,9 @@ namespace Day11
                     break;
                 }
 
-                case LT_CMD:
+                case Commands.LT:
                 {
-                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    ok = GetInputs(curr, 2, modeParam1, out Int64 input1, modeParam2, out Int64 input2);
                     if (ok)
                     {
                         if (input1 < input2)
@@ -252,9 +268,9 @@ namespace Day11
                     break;
                 }
 
-                case EQ_CMD:
+                case Commands.EQ:
                 {
-                    ok = GetInputs(curr, 2, modeParam1, out int input1, modeParam2, out int input2);
+                    ok = GetInputs(curr, 2, modeParam1, out Int64 input1, modeParam2, out Int64 input2);
                     if (ok)
                     {
                         if (input1 == input2)
@@ -275,9 +291,27 @@ namespace Day11
                     break;
                 }
 
-                case HALT_CMD:
+                case Commands.REL:
+                {
+                    ok = GetInputs(curr, 1, modeParam1, out Int64 input1, modeParam2, out Int64 input2);
+
+                    if (ok)
+                    {
+                        // got a value, now adjust the relative jump base by the amount
+                        relativeOffset += input1;
+
+                    }
+                    else
+                    {
+                        Debugger.Break();
+                    }
+
+                    jumpAmt = 2;
+                    break;
+                }
+
+                case Commands.HALT:
                     // code done case
-                    MessageBox.Show($"Found code 99 at pos {curr}.");
                     jumpAmt = 1;
                     ok = true;
                     break;
@@ -292,40 +326,45 @@ namespace Day11
             return ok;
         }
 
-        protected bool SetOutput(int curr, int paramOffset, char mode, int val)
+        protected bool SetOutput(Int64 curr, Int64 paramOffset, char mode, Int64 val)
         {
             string valStr = val.ToString();
             return SetOutput(curr, paramOffset, mode, valStr);
         }
 
-        protected bool SetOutput(int curr, int paramOffset, char mode, string val)
+        protected bool SetOutput(Int64 curr, Int64 paramOffset, char mode, string val)
         {
             bool ok = false;
+            AddrModes modeInt = (AddrModes)(mode - '0');
 
-            switch (mode)
+            switch (modeInt)
             {
-                case ADDR:
+                case AddrModes.ADDR:
                 {
-                    int address = 0;
-                    ok = Int32.TryParse(data[curr + paramOffset], out address);
+                    Int64 address = 0;
+                    ok = Int64.TryParse(data[curr + paramOffset], out address);
 
                     if (ok)
-                        if (address < data.Length)
-                        {
-                            ok = true;
-                            //data[address] = val;
-                            SetData(address, val);
-                        }
-                        else
-                            ok = false;
+                        ok = SetData(address, val);
+                    else
+                        throw new Exception("parse failed: " + data[curr + paramOffset].ToString()); //
                     break;
                 }
 
-                case IMMED:
+                case AddrModes.IMMED:
                 {
-                    ok = true;
-                    //data[curr + paramOffset] = val;
-                    SetData(curr + paramOffset, val);
+                    ok = SetData(curr + paramOffset, val);
+                    break;
+                }
+
+                case AddrModes.REL:
+                {
+                    Int64 address = 0;
+                    ok = Int64.TryParse(data[curr + paramOffset], out address);
+
+                    address += relativeOffset;
+                    if (ok)
+                        ok = SetData(address, val);
                     break;
                 }
 
@@ -339,16 +378,10 @@ namespace Day11
             return ok;
         }
 
-        protected bool GetInputs(int curr, int numParams, char modeParam1, out int input1, char modeParam2, out int input2)
+        private bool GetInputs(Int64 curr, Int64 numParams, char modeParam1, out Int64 input1, char modeParam2, out Int64 input2)
         {
             input1 = 0;
             input2 = 0;
-
-            if ((curr + numParams) >= data.Length)
-            {
-                MessageBox.Show("Error: Would go outside the code to get the input parameters.");
-                return false;
-            }
 
             bool ok = true;
 
@@ -361,31 +394,53 @@ namespace Day11
             return ok;
         }
 
-        protected bool GetInput(int param, char mode, out int val)
+        private bool GetInput(Int64 param, char mode, out Int64 val)
         {
             bool ok = false;
             val = 0;
 
-            switch (mode)
+            AddrModes modeAM = (AddrModes)(mode - '0');
+
+            switch (modeAM)
             {
-                case ADDR:
+                case AddrModes.ADDR:
+                case AddrModes.REL:
                 {
-                    int address = 0;
-                    ok = Int32.TryParse(data[param], out address);
+                    Int64 address = 0;
+                    ok = Int64.TryParse(data[param], out address);
+
+                    if (modeAM == AddrModes.REL)
+                    {
+                        // extra add the relative base
+                        address += relativeOffset;
+                    }
 
                     if (ok)
                         if (address < data.Length)
-                            ok = Int32.TryParse(data[address], out val);
+                        {
+                            ok = Int64.TryParse(data[address], out val);
+                            ram[address] = val;
+                        }
                         else
-                            ok = false;
+                        {
+                            if (ram.ContainsKey(address))
+                                val = ram[address];
+                            else
+                            {
+                                val = 0;
+                                ram[address] = val;
+                            }
+
+                        }
                     break;
                 }
 
-                case IMMED:
+                case AddrModes.IMMED:
                 {
-                    ok = Int32.TryParse(data[param], out val);
+                    ok = Int64.TryParse(data[param], out val);
                     break;
                 }
+
 
                 default:
                 {
@@ -396,23 +451,26 @@ namespace Day11
 
             return ok;
         }
-
-        protected void SetData(int address, string val)
+        private bool SetData(Int64 address, string val)
         {
-            if (address >= data.Length)
+
+            if (address < data.Length)
             {
-                MessageBox.Show($"not a valid address {address}");
-                return;
+                data[address] = val;
             }
 
-            if (data[address] == val)
-                return;
+            long ramVal = -1;
 
-            data[address] = val;
-            //NotifyPropertyChanged("Code");
+            bool ok;
+            ok = Int64.TryParse(val, out ramVal);
+
+            if (ok)
+                ram[address] = ramVal;
+
+            return ok;
         }
 
-        private bool GetAddresses(int currpos, int numParams, out int input1loc, out int input2loc, out int outputloc)
+        private bool GetAddresses(Int64 currpos, Int64 numParams, out Int64 input1loc, out Int64 input2loc, out Int64 outputloc)
         {
             input1loc = 0;
             input2loc = 0;
@@ -427,25 +485,25 @@ namespace Day11
             bool ok = true;
 
             if (ok && numParams >= 1)
-                ok = Int32.TryParse(data[currpos + 1], out input1loc);
+                ok = Int64.TryParse(data[currpos + 1], out input1loc);
 
             if (ok && numParams >= 2)
-                ok = Int32.TryParse(data[currpos + 2], out input2loc);
+                ok = Int64.TryParse(data[currpos + 2], out input2loc);
 
             if (ok && numParams >= 3)
-                ok = Int32.TryParse(data[currpos + 3], out outputloc);
+                ok = Int64.TryParse(data[currpos + 3], out outputloc);
 
             return ok;
         }
     }
 
     class ParallelCodeRunner : CodeRunner
-    { 
+    {
 
         private bool threadedResult = false;
         private Thread th;
 
-        private static void Threadify (object inst)
+        private static void Threadify(object inst)
         {
             if (inst is ParallelCodeRunner crInst)
             {
@@ -467,9 +525,9 @@ namespace Day11
         }
 
         public bool ThreadedResult()
-        { 
+        {
             th.Join();
-            return this.threadedResult;
+            return threadedResult;
         }
     }
 }
