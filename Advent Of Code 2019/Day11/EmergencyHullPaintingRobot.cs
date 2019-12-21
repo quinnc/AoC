@@ -9,9 +9,9 @@ namespace Day11
     class EmergencyHullPaintingRobot
     {
 
-        private string initcode;
-        private string currentcode;
-        private PaintTracker tracker;
+        private string initcode = null;
+        //private string currentcode;
+        private PaintTracker tracker = new PaintTracker();
 
         public void SetCode(string _code)
         {
@@ -24,11 +24,23 @@ namespace Day11
             
 
             tracker.Output = intcomp.ExternalInput;
+
             intcomp.ExternalOutput = tracker.Input;
-            intcomp.ExternalInput.Add("0");
+            intcomp.Code = initcode;
+            intcomp.ExternalInput.Add(inp.ToString()s);
+
+            intcomp.RunInThread();
+            tracker.RunInThread();
+
+            bool r = intcomp.ThreadedResult();
+
+            // now that the computer is done, tell the tracker to stop too.
+            tracker.Input.Add(PaintTracker.HALT);
+
+            bool s = tracker.ThreadedResult();
 
         }
 
-        public int PaintedSquares { get; private set; } = 0;
+        public int PaintedSquares => tracker.PaintedSquares;
     }
 }

@@ -2,16 +2,13 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Day11
 {
     class Location : Tuple<int, int>
     {
-        public Location (int _x, int _y) : base(_x, _y)
+        public Location(int _x, int _y) : base(_x, _y)
         {
         }
 
@@ -35,7 +32,7 @@ namespace Day11
 
     class PaintTracker
     {
-
+        public static string HALT = "halt";
         protected BlockingCollection<string> externalInput = new BlockingCollection<string>();
         protected BlockingCollection<string> externalOutput = null;
 
@@ -58,7 +55,7 @@ namespace Day11
         private bool threadedResult = false;
         private Thread th;
 
-        private bool Run ()
+        private bool Run()
         {
             if (Output == null)
             {
@@ -69,7 +66,7 @@ namespace Day11
             var val = externalInput.Take();
             bool isColour = true;
 
-            while (val != "halt")
+            while (val != HALT)
             {
                 int valInt = 0;
                 bool ok = false;
@@ -108,6 +105,17 @@ namespace Day11
             Turn(turnType);
 
             current = StepOne();
+
+            // report the current colour to compiler
+            if (visited.ContainsKey(current))
+            {
+                Output.Add(visited[current].ToString());
+            }
+            else
+            {
+                // if haven't been here before, then it is black
+                Output.Add("0");
+            }
         }
 
         private Location StepOne()
@@ -116,16 +124,16 @@ namespace Day11
             switch (facing)
             {
                 case Direction.Up:
-                    return new Location(current.x, current.y+1);
+                    return new Location(current.x, current.y + 1);
 
                 case Direction.Right:
-                    return new Location(current.x+1, current.y);
+                    return new Location(current.x + 1, current.y);
 
                 case Direction.Down:
                     return new Location(current.x, current.y - 1);
 
                 case Direction.Left:
-                    return new Location(current.x-1, current.y);
+                    return new Location(current.x - 1, current.y);
             }
 
             Debugger.Break();
@@ -174,15 +182,16 @@ namespace Day11
             if (colourInt == 1)
                 colour = Colour.White;
 
-            if (!visited.ContainsKey(current))
-            {
-                if (colour == Colour.White)
-                {
-                    visited[current] = colour;
-                }
-                // else do nothing
-            }
-            else
+            // re-reading is sounds like black-on-black counts as a point
+            //if (!visited.ContainsKey(current))
+            //{
+            //    if (colour == Colour.White)
+            //    {
+            //        visited[current] = colour;
+            //    }
+            //    // else do nothing
+            //}
+            //else
             {
                 // we already changed the colour once so we don't count repaints, but track current colour anyway
                 visited[current] = colour;
@@ -214,8 +223,11 @@ namespace Day11
         public bool ThreadedResult()
         {
             th.Join();
-            return this.threadedResult;
+            return threadedResult;
         }
+
+
+        public int PaintedSquares => visited.Count;
 
     }
 }

@@ -24,5 +24,17 @@ namespace Day11
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            EmergencyHullPaintingRobot ehpr = new EmergencyHullPaintingRobot();
+
+            ehpr.SetCode(tbCode.Text);
+            ehpr.Paint(0);
+            // paint will block until complete
+
+            tbResult.Text = $"The robot visited {ehpr.PaintedSquares} unique squares.";
+
+        }
     }
 }
