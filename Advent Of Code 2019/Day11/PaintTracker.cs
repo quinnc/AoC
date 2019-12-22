@@ -109,7 +109,7 @@ namespace Day11
             // report the current colour to compiler
             if (visited.ContainsKey(current))
             {
-                Output.Add(visited[current].ToString());
+                Output.Add(((int)visited[current]).ToString());
             }
             else
             {

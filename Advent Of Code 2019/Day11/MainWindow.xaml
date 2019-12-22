@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Day11"
         mc:Ignorable="d"
-       Title="Day 11 Emergency Hull Painting Robot" Height="450" Width="800">
+       Title="Day 11 Emergency Hull Painting Robot" Height="1000" Width="2000">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -21,6 +21,7 @@
                  VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
 
         <StackPanel Grid.Column="0" Grid.Row="2" >
+            <Button Content="Count painted squares..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
             <Button Content="Count painted squares..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
         </StackPanel>
         <TextBox Name="tbResult" Grid.Row="2" Grid.Column="1" 

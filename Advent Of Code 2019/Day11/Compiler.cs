@@ -155,7 +155,7 @@ namespace Day11
                         jumpAmt = 4;
                     }
                     else
-                        jumpAmt = 1000;
+                        throw new Exception("command error"); // jumpAmt = 1000;
 
                 }
                 break;
@@ -172,7 +172,7 @@ namespace Day11
                         jumpAmt = 4;
                     }
                     else
-                        jumpAmt = 1000;
+                        throw new Exception("command error"); //jumpAmt = 1000;
                 }
                 break;
 
@@ -388,8 +388,15 @@ namespace Day11
             if (ok && numParams >= 1)
                 ok = GetInput(curr + 1, modeParam1, out input1);
 
+            if (!ok)
+                throw new Exception("parse error: " + (curr+1).ToString()); //
+
             if (ok && numParams >= 2)
+            {
                 ok = GetInput(curr + 2, modeParam2, out input2);
+                if (!ok)
+                    throw new Exception("parse error: " + (curr + 2).ToString()); //
+            }
 
             return ok;
         }
@@ -432,12 +439,16 @@ namespace Day11
                             }
 
                         }
+                    else
+                        throw new Exception("parse error: " + data[param]); //
                     break;
                 }
 
                 case AddrModes.IMMED:
                 {
                     ok = Int64.TryParse(data[param], out val);
+                    if (!ok)
+                        throw new Exception("parse error: " + val); //
                     break;
                 }
 
@@ -466,6 +477,8 @@ namespace Day11
 
             if (ok)
                 ram[address] = ramVal;
+            else
+                throw new Exception("parse error: " + val); //
 
             return ok;
         }
