@@ -22,9 +22,9 @@
 
         <StackPanel Grid.Column="0" Grid.Row="2" >
             <Button Content="Count painted squares..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
-            <Button Content="Count painted squares..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
+            <Button Content="Paint" Name="btnPart2" Height="24" VerticalAlignment="Top" Click="BtnPart2_Click" />
         </StackPanel>
         <TextBox Name="tbResult" Grid.Row="2" Grid.Column="1" 
-                 VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap"/>
+                 VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Courier New"/>
     </Grid>
 </Window>

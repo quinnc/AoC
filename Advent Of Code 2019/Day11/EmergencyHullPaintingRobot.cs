@@ -42,5 +42,13 @@ namespace Day11
         }
 
         public int PaintedSquares => tracker.PaintedSquares;
+
+        public string IdImage
+        {
+            get
+            {
+                return string.Join(Environment.NewLine, tracker.ImageRotate);
+            }
+        }
     }
 }

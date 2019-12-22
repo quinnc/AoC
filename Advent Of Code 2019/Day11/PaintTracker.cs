@@ -41,6 +41,8 @@ namespace Day11
         Location current = new Location(0, 0);
         Direction facing = Direction.Up;
 
+        private int minX, maxX, minY, maxY;
+
         // takes in the output from the painting program
         // -> first output is the colour to paint the current square
         // -> second output is the directory to turn (then it moves forward one square in that direction) 
@@ -121,23 +123,41 @@ namespace Day11
         private Location StepOne()
         {
             // move the robot in that direction
+            Location l = current;
+
             switch (facing)
             {
                 case Direction.Up:
-                    return new Location(current.x, current.y + 1);
+                    l = new Location(current.x, current.y + 1);
+                    break;
 
                 case Direction.Right:
-                    return new Location(current.x + 1, current.y);
+                    l = new Location(current.x + 1, current.y);
+                    break;
 
                 case Direction.Down:
-                    return new Location(current.x, current.y - 1);
+                    l = new Location(current.x, current.y - 1);
+                    break;
 
                 case Direction.Left:
-                    return new Location(current.x - 1, current.y);
+                    l = new Location(current.x - 1, current.y);
+                    break;
             }
 
-            Debugger.Break();
-            return current;
+
+            if (l.x < minX)
+                minX = l.x;
+
+            if (l.x > maxX)
+                maxX = l.x;
+
+            if (l.y < minY)
+                minY = l.y;
+
+            if (l.y > maxY)
+                maxY = l.y;
+
+            return l;
         }
 
         private void Turn(int turnType)
@@ -229,5 +249,67 @@ namespace Day11
 
         public int PaintedSquares => visited.Count;
 
+        public IReadOnlyList<string> Image
+        {
+            get
+            {
+                var _image = new List<string>();
+                for (int x = minX; x <= maxX; x++)
+                {
+                    string s = "";
+
+                    for (int y = minY; y <= maxY; y++)
+                    {
+                        var l = new Location(x, y);
+
+                        if (visited.ContainsKey(l))
+                        {
+                            s += (visited[l] == Colour.Black) ? ' ' : '*';
+                        }
+                        else
+                        {
+                            if (x == 0 && y == 0)
+                                Debugger.Break();
+                            s += ' ';
+                        }
+                    }
+
+                    _image.Add(s);
+                }
+
+                return _image;
+            }
+        }
+
+        public IReadOnlyList<string> ImageRotate
+        {
+            get
+            {
+                var _image = new List<string>();
+                for (int y = maxY; y >= minY; y--)
+                {
+                    string s = "";
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        var l = new Location(x, y);
+
+                        if (visited.ContainsKey(l))
+                        {
+                            s += (visited[l] == Colour.Black) ? ' ' : '*';
+                        }
+                        else
+                        {
+                            if (x == 0 && y == 0)
+                                Debugger.Break();
+                            s += ' ';
+                        }
+                    }
+
+                    _image.Add(s);
+                }
+
+                return _image;
+            }
+        }
     }
 }

@@ -20,5 +20,20 @@ namespace Day11
             tbResult.Text = $"The robot visited {ehpr.PaintedSquares} unique squares.";
 
         }
+
+        private void BtnPart2_Click(object sender, RoutedEventArgs e)
+        {
+            EmergencyHullPaintingRobot ehpr = new EmergencyHullPaintingRobot();
+
+            ehpr.SetCode(tbCode.Text);
+
+            // part 2 starts off on a white square
+            ehpr.Paint(1);
+            // paint will block until complete
+
+            // generate the image
+            // show the image.
+            tbResult.Text = ehpr.IdImage;
+        }
     }
 }
