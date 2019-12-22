@@ -1,0 +1,30 @@
+﻿<Window x:Class="day12_3BodyProblem.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:day12_3BodyProblem"
+        mc:Ignorable="d"
+    Title="Day 12 Moon Avoidance" Height="1000" Width="2000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*" />
+            <RowDefinition Height="0.5*" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Column="0" Grid.Row="0" Content="IntCode to execute" />
+        <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" 
+                 VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
+
+        <StackPanel Grid.Column="0" Grid.Row="2" >
+            <Button Content="Total Energy @ 1000..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
+            <!--<Button Content="Paint" Name="btnPart2" Height="24" VerticalAlignment="Top" Click="BtnPart2_Click" />-->
+        </StackPanel>
+        <TextBox Name="tbResult" Grid.Row="2" Grid.Column="1" 
+                 VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Courier New"/>
+    </Grid>
+</Window>
