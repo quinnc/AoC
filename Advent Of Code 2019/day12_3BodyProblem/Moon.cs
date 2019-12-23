@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 
 namespace day12_3BodyProblem
 {
@@ -10,7 +11,7 @@ namespace day12_3BodyProblem
         {
             ThreeD result = new ThreeD();
             result.x = lhs.x + rhs.x;
-            result.y = lhs.x + rhs.y;
+            result.y = lhs.y + rhs.y;
             result.z = lhs.z + rhs.z;
 
             return result;
@@ -20,7 +21,7 @@ namespace day12_3BodyProblem
         {
             string s = "";
 
-            s = "<x=" + x.ToString("D4") + ", y=" + y.ToString("D4") + ", z=" + z.ToString("D4") + ">";
+            s = "<x=" + x.ToString().PadRight(3) + ", y=" + y.ToString().PadRight(3) + ", z=" + z.ToString().PadRight(3) + ">";
             return s;
         }
 
@@ -49,9 +50,17 @@ namespace day12_3BodyProblem
         {
             int _z = 0, _y = 0, _x = 0;
 
-            Int32.TryParse(_xS, out _x);
-            Int32.TryParse(_yS, out _y);
-            Int32.TryParse(_zS, out _z);
+            bool ok = false;
+
+            ok = Int32.TryParse(_xS, out _x);
+            if (!ok)
+                MessageBox.Show($"failed to parse {_xS}");
+            ok = Int32.TryParse(_yS, out _y);
+            if (!ok)
+                MessageBox.Show($"failed to parse {_yS}");
+            ok = Int32.TryParse(_zS, out _z);
+            if (!ok)
+                MessageBox.Show($"failed to parse {_zS}");
 
             Init(_x, _y, _z);
 
@@ -93,6 +102,6 @@ namespace day12_3BodyProblem
             return s;
         }
 
-        public int TotalEnergy => location.Energy + speed.Energy;
+        public int TotalEnergy => location.Energy * speed.Energy;
     }
 }

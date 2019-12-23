@@ -30,10 +30,23 @@ namespace day12_3BodyProblem
             MoonSystem ms = new MoonSystem();
 
             ms.SetLocations(tbCode.Text);
+            tbResult.Text = "";
 
-            ms.RunSteps(1000);
+            int i = 0;
+            for (i = 0; i < 10; i++)
+            {
+                tbResult.Text += " Step " + (i * 100).ToString() + Environment.NewLine;
+                tbResult.Text += ms.SystemDescription;
+                tbResult.Text += ms.TotalEnergy.ToString() + Environment.NewLine + Environment.NewLine;
 
-            tbResult.Text = ms.TotalEnergy.ToString();
+                ms.RunSteps(100);
+
+            }
+
+            tbResult.Text += " Step " + (i * 100).ToString() + Environment.NewLine;
+            tbResult.Text += ms.SystemDescription;
+            tbResult.Text += ms.TotalEnergy.ToString() + Environment.NewLine + Environment.NewLine;
+
         }
     }
 }
