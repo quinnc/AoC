@@ -3,11 +3,19 @@ using System.Windows;
 
 namespace day12_3BodyProblem
 {
+    static class Extensions
+    {
+        public static int RotateLeft(this int value, int count)
+        {
+            return (value << count) | (value >> (32 - count));
+        }
+    }
+
     class ThreeD
     {
         public int x, y, z;
 
-        public static ThreeD operator+ (ThreeD lhs, ThreeD rhs)
+        public static ThreeD operator +(ThreeD lhs, ThreeD rhs)
         {
             ThreeD result = new ThreeD();
             result.x = lhs.x + rhs.x;
@@ -26,18 +34,31 @@ namespace day12_3BodyProblem
         }
 
         public int Energy => Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
-        
+
+        public void Add(ThreeD rhs)
+        {
+            x += rhs.x;
+            y += rhs.y;
+            z += rhs.z;
+        }
+
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() ^ y.GetHashCode().RotateLeft(16) ^ z.GetHashCode().RotateLeft(32);
+        }
     }
+
+
     class Moon
     {
-        ThreeD location, speed;
+        public ThreeD location, speed;
 
-        public Moon (int _x, int _y, int _z)
+        public Moon(int _x, int _y, int _z)
         {
             Init(_x, _y, _z);
         }
-        
-        private void Init (int _x, int _y, int _z)
+
+        private void Init(int _x, int _y, int _z)
         {
             location = new ThreeD()
             { x = _x, y = _y, z = _z };
@@ -80,8 +101,8 @@ namespace day12_3BodyProblem
             ApplyGravityAxis(location.z, other.location.z, ref speed.z);
         }
 
-        private void ApplyGravityAxis (int thisLoc, int otherLoc, ref int thisSpeed)
-        { 
+        private void ApplyGravityAxis(int thisLoc, int otherLoc, ref int thisSpeed)
+        {
             if (thisLoc < otherLoc)
                 thisSpeed++;
             else if (thisLoc > otherLoc)
@@ -91,17 +112,24 @@ namespace day12_3BodyProblem
 
         public void UpdateLocation()
         {
-            location += speed;
+            // location += speed;
+            location.Add(speed);
         }
 
         public override string ToString()
         {
-            string s ="";
+            string s = "";
 
             s = $"pos={location} vel={speed} pot={location.Energy} kin={speed.Energy}";
             return s;
         }
 
         public int TotalEnergy => location.Energy * speed.Energy;
+
+        public override int GetHashCode()
+        {
+            return location.GetHashCode() ^ speed.GetHashCode().RotateLeft(16) ;
+        }
+
     }
 }

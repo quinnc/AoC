@@ -48,5 +48,19 @@ namespace day12_3BodyProblem
             tbResult.Text += ms.TotalEnergy.ToString() + Environment.NewLine + Environment.NewLine;
 
         }
+
+        private void BtnPart2_Click(object sender, RoutedEventArgs e)
+        {
+            MoonSystem ms = new MoonSystem();
+
+            ms.SetLocations(tbCode.Text);
+            tbResult.Text = "";
+
+            ulong steps = 0;
+            //ms.SimulateWithRepeats(out steps);
+            ms.FindByLeastCommonMultiple(out steps);
+
+            tbResult.Text = steps.ToString();
+        }
     }
 }

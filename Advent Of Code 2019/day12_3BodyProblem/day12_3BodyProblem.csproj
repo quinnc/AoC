@@ -69,6 +69,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MathUtils.cs" />
     <Compile Include="Moon.cs" />
     <Compile Include="MoonSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
