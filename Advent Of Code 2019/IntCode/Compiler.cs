@@ -41,6 +41,8 @@ namespace IntCode
         private Int64 currentInput = 0;
         private Int64 relativeOffset = 0;
 
+        private bool _stop = false;
+
         public BlockingCollection<string> ExternalInput => externalInput;
 
         public BlockingCollection<string> ExternalOutput
@@ -73,7 +75,7 @@ namespace IntCode
             Commands lastCommand = Commands.DUMP;
 
 
-            while (execptr < szData && lastCommand != Commands.HALT)
+            while (!_stop && execptr < szData && lastCommand != Commands.HALT)
             {
                 ok = Command(execptr, out Int64 cmdSize, out lastCommand);
                 if (!ok)
@@ -508,6 +510,11 @@ namespace IntCode
 
             return ok;
         }
+
+        public virtual void Stop()
+        {
+            _stop = true;
+        }
     }
 
     class ParallelCodeRunner : CodeRunner
@@ -542,5 +549,6 @@ namespace IntCode
             th.Join();
             return threadedResult;
         }
+
     }
 }

@@ -30,7 +30,7 @@ namespace day13_pong
     class Game : INotifyPropertyChanged
     {
         string code;
-        Dictionary<Location, GamePiece> board = new Dictionary<Location, GamePiece>();
+         Dictionary<Location, GamePiece> board = new Dictionary<Location, GamePiece>();
         ulong score = 0;
         BlockingCollection<string> gameOutput = new BlockingCollection<string>();
 
@@ -110,6 +110,7 @@ namespace day13_pong
 
         }
 
+        private IntCode.ParallelCodeRunner prog;
 
         public void PlayUnlimited()
         {
@@ -117,7 +118,7 @@ namespace day13_pong
             //start listener thread
 
             // start code
-            IntCode.ParallelCodeRunner prog = new IntCode.ParallelCodeRunner();
+            prog = new IntCode.ParallelCodeRunner();
 
             // set the program to play infinitely
             char[] array = code.ToCharArray();
@@ -128,8 +129,8 @@ namespace day13_pong
             
             prog.ExternalOutput = gameOutput;
 
-            // run it to completion, then look at the output
-            prog.Run();
+            
+            prog.RunInThread();
 
         }
 
@@ -137,5 +138,99 @@ namespace day13_pong
         {
             return board.Count(x => x.Value == tileType);
         }
+
+        public void LeftPressed()
+        {
+            gameOutput.Add(((int)Move.Left).ToString());
+        }
+
+        public void StayPressed()
+        {
+            gameOutput.Add(((int)Move.Stay).ToString());
+        }
+
+        public void RightPressed()
+        {
+            gameOutput.Add(((int)Move.Right).ToString());
+        }
+
+        public bool Stop()
+        {
+            prog?.Stop();
+            return prog.ThreadedResult();
+        }
+
+        public override string ToString()
+        {
+            List<List<char>> screen = new List<List<char>>();
+            foreach (var tile in board)
+            {
+                if (screen[tile.Key.y] == null)
+                    screen[tile.Key.y] = new List<char>();
+
+                switch (tile.Value)
+                {
+                    case GamePiece.Ball:
+                        screen[tile.Key.y][tile.Key.x] = 'o';
+                        break;
+
+                    case GamePiece.Block:
+                        screen[tile.Key.y][tile.Key.x] = '#';
+                        break;
+
+                    case GamePiece.Paddle:
+                        screen[tile.Key.y][tile.Key.x] = '-';
+                        break;
+
+                    case GamePiece.Tile:
+                        screen[tile.Key.y][tile.Key.x] = ' ';
+                        break;
+
+                    case GamePiece.Wall:
+                        screen[tile.Key.y][tile.Key.x] = '|';
+                        break;
+                }
+
+            }
+
+            int maxrow = screen.Count;
+            int maxcol = 0;
+
+            foreach (var row in screen)
+            {
+                if (row.Count > maxcol)
+                    maxcol = row.Count;
+            }
+
+            string gamescreen = "";
+
+            for (int i = maxrow - 1; i >= 0; i--)
+            {
+                string screenline = "";
+                for (int j = 0; j < maxcol; j++)
+                {
+                    if (screen[i] == null)
+                        break;
+
+                    if (j > screen[i].Count)
+                    {
+                        screenline += ' ';
+                        continue;
+                    }
+                    else
+                    {
+                        screenline += screen[i][j];
+                    }
+                }
+
+                gamescreen += Environment.NewLine + screenline;
+
+            }
+
+            return gamescreen;
+        }
+
+
+        public string Score => score.ToString();
     }
 }

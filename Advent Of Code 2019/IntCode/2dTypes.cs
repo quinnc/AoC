@@ -3,7 +3,7 @@ using System;
 
 namespace TwodTypes
 {
-    class Location : Tuple<int, int>
+    public class Location : Tuple<int, int>
     {
         public Location(int _x, int _y) : base(_x, _y)
         {
