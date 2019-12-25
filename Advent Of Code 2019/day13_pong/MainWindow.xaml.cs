@@ -20,6 +20,8 @@ namespace day13_pong
     /// </summary>
     public partial class MainWindow : Window
     {
+        Game game;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -27,11 +29,32 @@ namespace day13_pong
 
         private void BtnPartA_Click(object sender, RoutedEventArgs e)
         {
-            Game game = new Game(tbCode.Text);
+            game = new Game(tbCode.Text);
 
             game.Play();
 
             tbResult.Text = $"There are {game.Count(GamePiece.Block)} block tiles when the game is done.";
+        }
+
+
+
+        private void Grid_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void BtnPart2_Click(object sender, RoutedEventArgs e)
+        {
+
+            game = new Game(tbCode.Text);
+            game.PlayUnlimited();
+
+            LeftButton.IsEnabled = true;
+            StayButton.IsEnabled = true;
+            RightButton.IsEnabled = true;
+
+
+
         }
     }
 }
