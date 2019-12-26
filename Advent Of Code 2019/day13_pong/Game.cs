@@ -1,10 +1,12 @@
-﻿using System;
+﻿using IntCode;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows;
 using TwodTypes;
 
@@ -27,24 +29,17 @@ namespace day13_pong
         Right = 1,
     }
 
-    class Game : INotifyPropertyChanged
+    class Game : IThreadible
     {
         string code;
-         Dictionary<Location, GamePiece> board = new Dictionary<Location, GamePiece>();
+        ConcurrentDictionary<Location, GamePiece> board = new ConcurrentDictionary<Location, GamePiece>();
         ulong score = 0;
         BlockingCollection<string> gameOutput = new BlockingCollection<string>();
+        private IntCode.ParallelCodeRunner prog;
+        private bool _stop = false;
+        private Threadify threadThis = new Threadify();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        // This method is called by the Set accessor of each property.  
-        // The CallerMemberName attribute that is applied to the optional propertyName  
-        // parameter causes the property name of the caller to be substituted as an argument.  
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-
+        
         public Game(string _code)
         {
             code = _code;
@@ -53,7 +48,7 @@ namespace day13_pong
 
         public void Play()
         {
-            IntCode.ParallelCodeRunner prog = new IntCode.ParallelCodeRunner();
+            prog = new IntCode.ParallelCodeRunner();
 
             prog.Code = code;
 
@@ -101,7 +96,10 @@ namespace day13_pong
                 {
                     Location l = new Location(x, y);
 
-                    board[l] = (GamePiece)(tile);
+                    //board.AddOrUpdate(l, (GamePiece)(tile));
+                    //board.GetOrAdd()
+                    //board.AddOrUpdate(l, tile, loc, oldTile, newTile => { })
+                    board[l] = (GamePiece)tile;
                 }
 
             }
@@ -110,7 +108,22 @@ namespace day13_pong
 
         }
 
-        private IntCode.ParallelCodeRunner prog;
+        //  threaded implementation sot hat I can test my draw routine
+        public void PlayThread()
+        {
+            threadThis.Instance = this;
+            threadThis.RunInThread();
+
+            prog = new IntCode.ParallelCodeRunner();
+
+            prog.Code = code;
+            prog.ExternalOutput = gameOutput;
+
+
+            prog.RunInThread();
+
+
+        }
 
         public void PlayUnlimited()
         {
@@ -156,8 +169,8 @@ namespace day13_pong
 
         public bool Stop()
         {
-            prog?.Stop();
-            return prog.ThreadedResult();
+            this._stop = true;
+            return prog.EndThread() && threadThis.ThreadedResult();
         }
 
         public override string ToString()
@@ -230,6 +243,83 @@ namespace day13_pong
             return gamescreen;
         }
 
+        bool IThreadible.StartMember()
+        {
+            int mode = 0;
+            string xStr = prog.ExternalInput.Take();
+            string yStr = prog.ExternalInput.Take();
+            string tileStr = prog.ExternalInput.Take();
+
+            int x, y, tile;
+
+            bool ok = false;
+
+            while (!_stop)
+            {
+                x = -100;
+                y = -100;
+                    tile = -100;
+                switch (mode)
+                {
+                    case 0:
+                    {
+                        ok = Int32.TryParse(xStr, out x);
+                        if (!ok)
+                            Debugger.Break();
+                        mode = 1;
+                    }
+                    break;
+
+                    case 1:
+                    {
+                        ok = Int32.TryParse(yStr, out y);
+                        if (!ok)
+                            Debugger.Break();
+                        mode = 2;
+                    }
+                    break;
+
+                    case 2:
+                    {
+                        ok = Int32.TryParse(tileStr, out tile);
+                        if (!ok)
+                            Debugger.Break();
+                        mode = 0;
+                    }
+                    break;
+                }
+
+                if (x == -100 || y == -100 || tile == -100)
+                {
+                    Debugger.Break();
+                    return false;
+                }
+
+                // then just got the third value, so interpret the triad
+                if (mode == 0)
+                {
+                    if (x == -1 && y == 0)
+                    {
+                        // score not location
+                        score = (ulong)tile;
+                    }
+                    else
+                    {
+                        Location l = new Location(x, y);
+
+                        //board.AddOrUpdate(l, (GamePiece)(tile));
+                        //board.GetOrAdd()
+                        //board.AddOrUpdate(l, tile, loc, oldTile, newTile => { })
+                        board[l] = (GamePiece)tile;
+                    }
+                }
+
+                Thread.Yield();
+                Thread.Sleep(0);
+            }
+
+            return ok;
+        }
 
         public string Score => score.ToString();
     }

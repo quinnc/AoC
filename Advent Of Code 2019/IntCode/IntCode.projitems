@@ -12,5 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)2dTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compiler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MathUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Threadify.cs" />
   </ItemGroup>
 </Project>

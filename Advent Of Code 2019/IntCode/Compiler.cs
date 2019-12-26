@@ -41,7 +41,7 @@ namespace IntCode
         private Int64 currentInput = 0;
         private Int64 relativeOffset = 0;
 
-        private bool _stop = false;
+        protected bool _stop = false;
 
         public BlockingCollection<string> ExternalInput => externalInput;
 
@@ -85,6 +85,9 @@ namespace IntCode
                 }
 
                 execptr += cmdSize;
+
+                Thread.Yield();
+                Thread.Sleep(0);
             }
 
             return ok;
@@ -517,38 +520,25 @@ namespace IntCode
         }
     }
 
-    class ParallelCodeRunner : CodeRunner
+    class ParallelCodeRunner : CodeRunner, IThreadible
     {
+        Threadify threaded = new Threadify();
 
-        private bool threadedResult = false;
-        private Thread th;
-
-        private static void Threadify(object inst)
+        bool IThreadible.StartMember()
         {
-            if (inst is ParallelCodeRunner crInst)
-            {
-                crInst.threadedResult = crInst.Run();
-            }
-            else
-            {
-                Debugger.Break();
-            }
+            return this.Run();
         }
 
-        public void RunInThread()
+        public void RunInThread ()
         {
-
-            th = new Thread(Threadify);
-            th.Start(this);
-
-            Thread.Sleep(0);
+            threaded.Instance = this;
+            threaded.RunInThread();
         }
 
-        public bool ThreadedResult()
+        public bool EndThread()
         {
-            th.Join();
-            return threadedResult;
+            this.Stop();
+            return threaded.ThreadedResult();
         }
-
     }
 }

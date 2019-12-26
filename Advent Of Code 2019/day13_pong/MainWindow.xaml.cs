@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IntCode;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -33,11 +34,12 @@ namespace day13_pong
 
         private void BtnPartA_Click(object sender, RoutedEventArgs e)
         {
+            tbResult.Text = "";
             game = new Game(tbCode.Text);
 
-            game.Play();
+            //game.Play();
 
-            tbResult.Text = $"There are {game.Count(GamePiece.Block)} block tiles when the game is done.";
+            game.PlayThread();
         }
 
 
@@ -61,22 +63,23 @@ namespace day13_pong
                     game.StayPressed();
                     e.Handled = true;
                     break;
+                case Key.Escape:
+                    EndGame();
+                    e.Handled = true;
+                    break;
             }
         }
 
         private void BtnPart2_Click(object sender, RoutedEventArgs e)
         {
-
+            gameDrawer = new GameDraw(ref tbResult, ref tbScore, ref game);
+            gameDrawer.Start();
             game = new Game(tbCode.Text);
             game.PlayUnlimited();
 
             LeftButton.IsEnabled = true;
             StayButton.IsEnabled = true;
             RightButton.IsEnabled = true;
-
-            gameDrawer = new GameDraw(ref tbResult, ref tbScore, ref game);
-            gameDrawer.RunInThread();
-
         }
 
         private void LeftButton_Click(object sender, RoutedEventArgs e)
@@ -96,22 +99,28 @@ namespace day13_pong
 
         private void EndButton_Click(object sender, RoutedEventArgs e)
         {
+        }
+
+        private void EndGame()
+        {
+
             gameDrawer?.Stop();
             game?.Stop();
+            tbResult.Text += $"There are {game.Count(GamePiece.Block)} block tiles when the game is done.";
         }
     }
 
-    class GameDraw
+    class GameDraw: IThreadible
     {
 
         private TextBox screen, scorebox;
         private Game _game;
         bool stop = false;
 
-        public void Stop()
+        public bool Stop()
         {
             stop = true;
-            
+            return threadThis.ThreadedResult();
         }
 
         public GameDraw (ref TextBox output, ref TextBox score, ref Game game)
@@ -121,48 +130,26 @@ namespace day13_pong
             _game = game ;
         }
 
-        private bool threadedResult = false;
-        private Thread th;
 
-        private static void Threadify(object inst)
-        {
-            if (inst is GameDraw crInst)
-            {
-                crInst.threadedResult = crInst.Run();
-            }
-            else
-            {
-                Debugger.Break();
-            }
-        }
+        Threadify threadThis = new Threadify();
 
-        private bool Run()
+        bool IThreadible.StartMember()
         {
             while (!stop)
             {
-                Thread.Sleep(100);
-  
+                Thread.Yield();
+                Thread.Sleep(0); ;
+
                 screen.Text = _game.ToString();
                 scorebox.Text = _game.Score;
             }
-
             return true;
         }
 
-        public void RunInThread()
+        public void Start ()
         {
-
-            th = new Thread(Threadify);
-            th.Start(this);
-
-            Thread.Sleep(0);
+            threadThis.Instance = this;
+            threadThis.RunInThread();
         }
-
-        public bool ThreadedResult()
-        {
-            th.Join();
-            return threadedResult;
-        }
-
     }
 }
