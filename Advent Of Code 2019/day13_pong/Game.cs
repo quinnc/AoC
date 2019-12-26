@@ -95,22 +95,18 @@ namespace day13_pong
                 else
                 {
                     Location l = new Location(x, y);
-
-                    //board.AddOrUpdate(l, (GamePiece)(tile));
-                    //board.GetOrAdd()
-                    //board.AddOrUpdate(l, tile, loc, oldTile, newTile => { })
                     board[l] = (GamePiece)tile;
                 }
-
             }
 
             // everything is put on the board
-
         }
 
         //  threaded implementation sot hat I can test my draw routine
         public void PlayThread()
         {
+            prog = new IntCode.ParallelCodeRunner();
+
             threadThis.Instance = this;
             threadThis.RunInThread();
 
@@ -119,19 +115,16 @@ namespace day13_pong
             prog.Code = code;
             prog.ExternalOutput = gameOutput;
 
-
             prog.RunInThread();
-
-
         }
 
         public void PlayUnlimited()
         {
+            prog = new IntCode.ParallelCodeRunner();
 
             //start listener thread
-
-            // start code
-            prog = new IntCode.ParallelCodeRunner();
+            threadThis.Instance = this;
+            threadThis.RunInThread();
 
             // set the program to play infinitely
             char[] array = code.ToCharArray();
@@ -139,12 +132,10 @@ namespace day13_pong
             code = new string(array);
 
             prog.Code = code;
-            
             prog.ExternalOutput = gameOutput;
 
-            
+            // start code
             prog.RunInThread();
-
         }
 
         public int Count(GamePiece tileType)
@@ -203,7 +194,6 @@ namespace day13_pong
                         screen[tile.Key.y][tile.Key.x] = '|';
                         break;
                 }
-
             }
 
             int maxrow = screen.Count;
@@ -258,7 +248,8 @@ namespace day13_pong
             {
                 x = -100;
                 y = -100;
-                    tile = -100;
+                tile = -100;
+
                 switch (mode)
                 {
                     case 0:
@@ -306,10 +297,6 @@ namespace day13_pong
                     else
                     {
                         Location l = new Location(x, y);
-
-                        //board.AddOrUpdate(l, (GamePiece)(tile));
-                        //board.GetOrAdd()
-                        //board.AddOrUpdate(l, tile, loc, oldTile, newTile => { })
                         board[l] = (GamePiece)tile;
                     }
                 }

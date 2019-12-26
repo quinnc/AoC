@@ -39,6 +39,9 @@ namespace day13_pong
 
             //game.Play();
 
+
+            gameDrawer = new GameDraw(ref tbResult, ref tbScore, ref game);
+            gameDrawer.Start();
             game.PlayThread();
         }
 
@@ -99,57 +102,14 @@ namespace day13_pong
 
         private void EndButton_Click(object sender, RoutedEventArgs e)
         {
+            EndGame();
         }
 
         private void EndGame()
         {
-
             gameDrawer?.Stop();
             game?.Stop();
             tbResult.Text += $"There are {game.Count(GamePiece.Block)} block tiles when the game is done.";
-        }
-    }
-
-    class GameDraw: IThreadible
-    {
-
-        private TextBox screen, scorebox;
-        private Game _game;
-        bool stop = false;
-
-        public bool Stop()
-        {
-            stop = true;
-            return threadThis.ThreadedResult();
-        }
-
-        public GameDraw (ref TextBox output, ref TextBox score, ref Game game)
-        {
-            screen = output;
-            scorebox = score;
-            _game = game ;
-        }
-
-
-        Threadify threadThis = new Threadify();
-
-        bool IThreadible.StartMember()
-        {
-            while (!stop)
-            {
-                Thread.Yield();
-                Thread.Sleep(0); ;
-
-                screen.Text = _game.ToString();
-                scorebox.Text = _game.Score;
-            }
-            return true;
-        }
-
-        public void Start ()
-        {
-            threadThis.Instance = this;
-            threadThis.RunInThread();
         }
     }
 }
