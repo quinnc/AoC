@@ -57,13 +57,6 @@ namespace day13_pong
                 string t = _game.ToString();
                 string s = _game.Score;
 
-                //screen.Text = t;
-                //screen.Invoke((MethodInvoker)delegate {
-                //    // Running on the UI thread
-                //    screen.Text = t;
-                //});
-                //scorebox.Text = s;
-
                 screen.Dispatcher.Invoke(screenCb, t);
                 scorebox.Dispatcher.Invoke(scoreCb, s);
             }

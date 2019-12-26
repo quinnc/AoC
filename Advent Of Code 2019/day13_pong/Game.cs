@@ -128,7 +128,7 @@ namespace day13_pong
 
             // set the program to play infinitely
             char[] array = code.ToCharArray();
-            array[1] = '2';
+            array[0] = '2';
             code = new string(array);
 
             prog.Code = code;

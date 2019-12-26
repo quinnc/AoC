@@ -109,7 +109,7 @@ namespace day13_pong
         {
             gameDrawer?.Stop();
             game?.Stop();
-            tbResult.Text += $"There are {game.Count(GamePiece.Block)} block tiles when the game is done.";
+            tbResult.Text += $"There are {game?.Count(GamePiece.Block)} block tiles when the game is done.";
         }
     }
 }
