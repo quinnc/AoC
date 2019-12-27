@@ -61,22 +61,6 @@ namespace day13_pong
                 string s = _game.Score;
 
                 screen.Dispatcher.BeginInvoke(screenCb, new object []{ t, s });
-
-                switch (Joystick)
-                {
-                    case -1:
-                        _game.LeftPressed();
-                        break;
-
-                    case 0:
-                        _game.StayPressed();
-                        break;
-
-                    case 1:
-                        _game.RightPressed();
-                        break;
-                }
-               
             }
             return true;
         }

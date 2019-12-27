@@ -302,7 +302,8 @@ namespace day13_pong
                     if (x == -1 && y == 0)
                     {
                         // score not location
-                        score = (ulong)tile;
+                        if (tile > 0)
+                            score = (ulong)tile;
                     }
                     else
                     {
@@ -319,7 +320,6 @@ namespace day13_pong
                             }
                             else if (tileGp == GamePiece.Paddle)
                             {
-
                                 paddleLastX = x;
                             }
 
