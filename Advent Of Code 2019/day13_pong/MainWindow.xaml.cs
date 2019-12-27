@@ -124,5 +124,10 @@ namespace day13_pong
             game?.Stop();
             tbResult.Text += Environment.NewLine + Environment.NewLine + Environment.NewLine + $"There are {game?.Count(GamePiece.Block)} block tiles when the game is done.";
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            EndGame();
+        }
     }
 }

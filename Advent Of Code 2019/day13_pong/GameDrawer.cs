@@ -38,7 +38,8 @@ namespace day13_pong
         private void SetScore( string str, string scoreStr)
         {
             screen.Text = str;
-            scorebox.Text = scoreStr;
+            if (scoreStr != "0")
+                scorebox.Text = scoreStr;
 
         }
         private void SetScreen (string str)
@@ -47,7 +48,6 @@ namespace day13_pong
         }
 
         public int Joystick { get; set; } = -100;
-
 
         Threadify threadThis = new Threadify();
 
