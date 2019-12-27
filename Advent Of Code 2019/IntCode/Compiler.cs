@@ -538,6 +538,7 @@ namespace IntCode
         public bool EndThread()
         {
             this.Stop();
+            this.ExternalOutput.Add("game over");
             return threaded.ThreadedResult();
         }
     }

@@ -18,8 +18,8 @@ namespace day13_pong
         private Game _game;
         bool stop = false;
 
-        public delegate void SetTextCallback(string str);
-        SetTextCallback scoreCb, screenCb;
+        public delegate void SetTextCallback(string str, string scoreStr);
+        SetTextCallback screenCb; //  scoreCb, 
 
 
         public bool Stop()
@@ -33,13 +33,15 @@ namespace day13_pong
             screen = output;
             scorebox = score;
             _game = game;
-            scoreCb = new SetTextCallback(SetScore);
-            screenCb = new SetTextCallback(SetScreen);
+            screenCb = new SetTextCallback(SetScore);
+           // screenCb = new SetTextCallback(SetScreen);
         }
 
-        private void SetScore( string str)
+        private void SetScore( string str, string scoreStr)
         {
-            scorebox.Text = str;
+            screen.Text = str;
+            scorebox.Text = scoreStr;
+
         }
         private void SetScreen (string str)
         {
@@ -53,12 +55,13 @@ namespace day13_pong
             while (!stop)
             {
                 Thread.Yield();
+                Thread.Sleep(100);
 
                 string t = _game.ToString();
                 string s = _game.Score;
 
-                screen.Dispatcher.Invoke(screenCb, t);
-                scorebox.Dispatcher.Invoke(scoreCb, s);
+                screen.Dispatcher.Invoke(screenCb, new object []{ t, s });
+                //scorebox.Dispatcher.Invoke(scoreCb, s);
             }
             return true;
         }

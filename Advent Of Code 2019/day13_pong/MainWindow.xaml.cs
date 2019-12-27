@@ -55,15 +55,15 @@ namespace day13_pong
             switch (e.Key)
             {
                 case Key.Left:
-                    game.LeftPressed();
+                    game?.LeftPressed();
                     e.Handled = true;
                     break;
                 case Key.Right:
-                    game.RightPressed();
+                    game?.RightPressed();
                     e.Handled = true;
                     break;
                 case Key.Up:
-                    game.StayPressed();
+                    game?.StayPressed();
                     e.Handled = true;
                     break;
                 case Key.Escape:
@@ -109,7 +109,7 @@ namespace day13_pong
         {
             gameDrawer?.Stop();
             game?.Stop();
-            tbResult.Text += $"There are {game?.Count(GamePiece.Block)} block tiles when the game is done.";
+            tbResult.Text += Environment.NewLine + Environment.NewLine + Environment.NewLine + $"There are {game?.Count(GamePiece.Block)} block tiles when the game is done.";
         }
     }
 }

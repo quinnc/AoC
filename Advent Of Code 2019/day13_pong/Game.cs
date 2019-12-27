@@ -169,8 +169,25 @@ namespace day13_pong
             List<List<char>> screen = new List<List<char>>();
             foreach (var tile in board)
             {
-                if (screen[tile.Key.y] == null)
-                    screen[tile.Key.y] = new List<char>();
+                if (screen.Count <= tile.Key.y)
+                {
+                    
+                    for (int ynew = screen.Count; ynew <= tile.Key.y; ynew++)
+                    {
+                        screen.Add(new List<char>());
+                    }
+                }
+                //if (screen[tile.Key.y] == null)
+                //    screen[tile.Key.y] = new List<char>();
+
+                if (screen[tile.Key.y].Count <= tile.Key.x)
+                {
+
+                    for (int xnew = screen[tile.Key.y].Count; xnew <= tile.Key.x; xnew++)
+                    {
+                        screen[tile.Key.y].Add(' ');
+                    }
+                }
 
                 switch (tile.Value)
                 {
@@ -236,25 +253,24 @@ namespace day13_pong
         bool IThreadible.StartMember()
         {
             int mode = 0;
-            string xStr = prog.ExternalInput.Take();
-            string yStr = prog.ExternalInput.Take();
-            string tileStr = prog.ExternalInput.Take();
+            string str;
 
             int x, y, tile;
+
+            x = -100;
+            y = -100;
+            tile = -100;
 
             bool ok = false;
 
             while (!_stop)
             {
-                x = -100;
-                y = -100;
-                tile = -100;
-
+                str = gameOutput.Take();
                 switch (mode)
                 {
                     case 0:
                     {
-                        ok = Int32.TryParse(xStr, out x);
+                        ok = Int32.TryParse(str, out x);
                         if (!ok)
                             Debugger.Break();
                         mode = 1;
@@ -263,7 +279,7 @@ namespace day13_pong
 
                     case 1:
                     {
-                        ok = Int32.TryParse(yStr, out y);
+                        ok = Int32.TryParse(str, out y);
                         if (!ok)
                             Debugger.Break();
                         mode = 2;
@@ -272,7 +288,7 @@ namespace day13_pong
 
                     case 2:
                     {
-                        ok = Int32.TryParse(tileStr, out tile);
+                        ok = Int32.TryParse(str, out tile);
                         if (!ok)
                             Debugger.Break();
                         mode = 0;
@@ -280,7 +296,7 @@ namespace day13_pong
                     break;
                 }
 
-                if (x == -100 || y == -100 || tile == -100)
+                if (x == -100 && y == -100 && tile == -100)
                 {
                     Debugger.Break();
                     return false;
@@ -299,10 +315,13 @@ namespace day13_pong
                         Location l = new Location(x, y);
                         board[l] = (GamePiece)tile;
                     }
+                    x = -100;
+                    y = -100;
+                    tile = -100;
                 }
 
                 Thread.Yield();
-                Thread.Sleep(0);
+                //Thread.Sleep(0);
             }
 
             return ok;
