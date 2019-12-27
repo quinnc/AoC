@@ -60,7 +60,7 @@ namespace day13_pong
                 string t = _game.ToString();
                 string s = _game.Score;
 
-                screen.Dispatcher.Invoke(screenCb, new object []{ t, s });
+                screen.Dispatcher.BeginInvoke(screenCb, new object []{ t, s });
                 //scorebox.Dispatcher.Invoke(scoreCb, s);
             }
             return true;
