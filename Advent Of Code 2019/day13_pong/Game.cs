@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using TwodTypes;
@@ -158,8 +156,8 @@ namespace day13_pong
 
         public bool Stop()
         {
-            this._stop = true;
-            this.gameOutput.Add("game over");
+            _stop = true;
+            gameOutput.Add("game over");
             return prog.EndThread() && threadThis.ThreadedResult();
         }
 
@@ -259,6 +257,9 @@ namespace day13_pong
 
             bool ok = false;
 
+            int ballLastX = -1;
+            int paddleLastX = -1;
+
             while (!_stop)
             {
                 str = gameOutput.Take();
@@ -292,7 +293,7 @@ namespace day13_pong
                     break;
                 }
 
-                if (!ok || (x == -100 && y == -100 && tile == -100) )
+                if (!ok || (x == -100 && y == -100 && tile == -100))
                     break;
 
                 // then just got the third value, so interpret the triad
@@ -307,10 +308,42 @@ namespace day13_pong
                     {
                         if (x >= 0 && y >= 0)
                         {
+                            GamePiece tileGp = (GamePiece)tile;
+
                             Location l = new Location(x, y);
-                            board[l] = (GamePiece)tile;
+                            board[l] = tileGp;
+
+                            if (tileGp == GamePiece.Ball)
+                            {
+                                ballLastX = x;
+                            }
+                            else if (tileGp == GamePiece.Paddle)
+                            {
+
+                                paddleLastX = x;
+                            }
+
+                            if ((paddleLastX != -1) && (ballLastX != -1))
+                            {
+
+                                // Empty the input queue in case the ball reversed direction on us
+                                while (prog.ExternalInput.TryTake(out var _)) { }
+                                if (ballLastX < paddleLastX)
+                                {
+                                    prog.ExternalInput.Add("-1");
+                                }
+                                else if (ballLastX == paddleLastX)
+                                {
+                                    prog.ExternalInput.Add("0");
+                                }
+                                else if (ballLastX > paddleLastX)
+                                {
+                                    prog.ExternalInput.Add("1");
+                                }
+                            }
                         }
                     }
+
                     x = -100;
                     y = -100;
                     tile = -100;

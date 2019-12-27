@@ -79,7 +79,7 @@ namespace IntCode
 
             while (!_stop && execptr < szData && lastCommand != Commands.HALT)
             {
-                //Thread.Sleep(1);
+                Thread.Sleep(1);
                 ok = Command(execptr, out Int64 cmdSize, out lastCommand);
                 if (!ok)
                 {
