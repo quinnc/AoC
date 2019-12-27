@@ -19,8 +19,7 @@ namespace day13_pong
         bool stop = false;
 
         public delegate void SetTextCallback(string str, string scoreStr);
-        SetTextCallback screenCb; //  scoreCb, 
-
+        SetTextCallback screenCb; 
 
         public bool Stop()
         {
@@ -34,7 +33,6 @@ namespace day13_pong
             scorebox = score;
             _game = game;
             screenCb = new SetTextCallback(SetScore);
-           // screenCb = new SetTextCallback(SetScreen);
         }
 
         private void SetScore( string str, string scoreStr)
@@ -48,20 +46,37 @@ namespace day13_pong
             screen.Text = str;
         }
 
+        public int Joystick { get; set; } = -100;
+
+
         Threadify threadThis = new Threadify();
 
         bool IThreadible.StartMember()
         {
             while (!stop)
             {
-                Thread.Yield();
-                Thread.Sleep(100);
+                Thread.Sleep(1);
 
                 string t = _game.ToString();
                 string s = _game.Score;
 
                 screen.Dispatcher.BeginInvoke(screenCb, new object []{ t, s });
-                //scorebox.Dispatcher.Invoke(scoreCb, s);
+
+                switch (Joystick)
+                {
+                    case -1:
+                        _game.LeftPressed();
+                        break;
+
+                    case 0:
+                        _game.StayPressed();
+                        break;
+
+                    case 1:
+                        _game.RightPressed();
+                        break;
+                }
+               
             }
             return true;
         }

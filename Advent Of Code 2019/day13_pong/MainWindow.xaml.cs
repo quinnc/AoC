@@ -34,13 +34,16 @@ namespace day13_pong
 
         private void BtnPartA_Click(object sender, RoutedEventArgs e)
         {
+            
+            if (game != null || gameDrawer != null)
+                EndGame();
             tbResult.Text = "";
+
+            Thread.Sleep(1000);
+
             game = new Game(tbCode.Text);
-
-            //game.Play();
-
-
             gameDrawer = new GameDraw(ref tbResult, ref tbScore, ref game);
+
             gameDrawer.Start();
             game.PlayThread();
         }
@@ -75,9 +78,16 @@ namespace day13_pong
 
         private void BtnPart2_Click(object sender, RoutedEventArgs e)
         {
-            gameDrawer = new GameDraw(ref tbResult, ref tbScore, ref game);
-            gameDrawer.Start();
+            if (game != null || gameDrawer != null)
+                EndGame();
+
+            tbResult.Text = "";
+
+            Thread.Sleep(1000);
             game = new Game(tbCode.Text);
+            gameDrawer = new GameDraw(ref tbResult, ref tbScore, ref game);
+
+            gameDrawer.Start();
             game.PlayUnlimited();
 
             LeftButton.IsEnabled = true;
@@ -88,16 +98,19 @@ namespace day13_pong
         private void LeftButton_Click(object sender, RoutedEventArgs e)
         {
             game?.LeftPressed();
+            gameDrawer.Joystick = -1;
         }
 
         private void StayButton_Click(object sender, RoutedEventArgs e)
         {
             game?.StayPressed();
+            gameDrawer.Joystick = 0;
         }
 
         private void RightButton_Click(object sender, RoutedEventArgs e)
         {
             game?.RightPressed();
+            gameDrawer.Joystick = 1;
         }
 
         private void EndButton_Click(object sender, RoutedEventArgs e)

@@ -39,7 +39,6 @@ namespace day13_pong
         private bool _stop = false;
         private Threadify threadThis = new Threadify();
 
-        
         public Game(string _code)
         {
             code = _code;
@@ -110,8 +109,6 @@ namespace day13_pong
             threadThis.Instance = this;
             threadThis.RunInThread();
 
-            prog = new IntCode.ParallelCodeRunner();
-
             prog.Code = code;
             prog.ExternalOutput = gameOutput;
 
@@ -130,6 +127,7 @@ namespace day13_pong
             char[] array = code.ToCharArray();
             array[0] = '2';
             code = new string(array);
+            //prog.InitRAM(0, 2);
 
             prog.Code = code;
             prog.ExternalOutput = gameOutput;
@@ -145,22 +143,23 @@ namespace day13_pong
 
         public void LeftPressed()
         {
-            gameOutput.Add(((int)Move.Left).ToString());
+            prog.ExternalInput.Add(((int)Move.Left).ToString());
         }
 
         public void StayPressed()
         {
-            gameOutput.Add(((int)Move.Stay).ToString());
+            prog.ExternalInput.Add(((int)Move.Stay).ToString());
         }
 
         public void RightPressed()
         {
-            gameOutput.Add(((int)Move.Right).ToString());
+            prog.ExternalInput.Add(((int)Move.Right).ToString());
         }
 
         public bool Stop()
         {
             this._stop = true;
+            this.gameOutput.Add("game over");
             return prog.EndThread() && threadThis.ThreadedResult();
         }
 
@@ -171,14 +170,11 @@ namespace day13_pong
             {
                 if (screen.Count <= tile.Key.y)
                 {
-                    
                     for (int ynew = screen.Count; ynew <= tile.Key.y; ynew++)
                     {
                         screen.Add(new List<char>());
                     }
                 }
-                //if (screen[tile.Key.y] == null)
-                //    screen[tile.Key.y] = new List<char>();
 
                 if (screen[tile.Key.y].Count <= tile.Key.x)
                 {
@@ -232,7 +228,7 @@ namespace day13_pong
                     if (screen[i] == null)
                         break;
 
-                    if (j > screen[i].Count)
+                    if (j >= screen[i].Count)
                     {
                         screenline += ' ';
                         continue;
@@ -272,7 +268,7 @@ namespace day13_pong
                     {
                         ok = Int32.TryParse(str, out x);
                         if (!ok)
-                            Debugger.Break();
+                            break;
                         mode = 1;
                     }
                     break;
@@ -281,7 +277,7 @@ namespace day13_pong
                     {
                         ok = Int32.TryParse(str, out y);
                         if (!ok)
-                            Debugger.Break();
+                            break;
                         mode = 2;
                     }
                     break;
@@ -290,17 +286,14 @@ namespace day13_pong
                     {
                         ok = Int32.TryParse(str, out tile);
                         if (!ok)
-                            Debugger.Break();
+                            break;
                         mode = 0;
                     }
                     break;
                 }
 
-                if (x == -100 && y == -100 && tile == -100)
-                {
-                    Debugger.Break();
-                    return false;
-                }
+                if (!ok || (x == -100 && y == -100 && tile == -100) )
+                    break;
 
                 // then just got the third value, so interpret the triad
                 if (mode == 0)
@@ -312,8 +305,11 @@ namespace day13_pong
                     }
                     else
                     {
-                        Location l = new Location(x, y);
-                        board[l] = (GamePiece)tile;
+                        if (x >= 0 && y >= 0)
+                        {
+                            Location l = new Location(x, y);
+                            board[l] = (GamePiece)tile;
+                        }
                     }
                     x = -100;
                     y = -100;

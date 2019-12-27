@@ -31,9 +31,13 @@ namespace IntCode
             REL = 2
         };
 
-
         private string[] data = null;
         private Dictionary<Int64, Int64> ram = new Dictionary<long, long>();
+
+        public void InitRAM (Int64 loc, Int64 val)
+        {
+            ram[loc] = val;
+        }
 
         protected BlockingCollection<string> externalInput = new BlockingCollection<string>();
         protected BlockingCollection<string> externalOutput = null;
@@ -70,24 +74,22 @@ namespace IntCode
                 return false;
             }
 
-            string haltStr = Commands.HALT.ToString();
             relativeOffset = 0;
             Commands lastCommand = Commands.DUMP;
 
-
             while (!_stop && execptr < szData && lastCommand != Commands.HALT)
             {
+                //Thread.Sleep(1);
                 ok = Command(execptr, out Int64 cmdSize, out lastCommand);
                 if (!ok)
                 {
                     Debugger.Break();
-                    throw new Exception($"command failed! position {execptr}");
+                    //throw new Exception($"command failed! position {execptr}");
+                    break;
                 }
 
                 execptr += cmdSize;
-
                 Thread.Yield();
-                Thread.Sleep(0);
             }
 
             return ok;
@@ -160,7 +162,12 @@ namespace IntCode
                         jumpAmt = 4;
                     }
                     else
-                        throw new Exception("command error"); // jumpAmt = 1000;
+                    {
+                        //  throw new Exception("command error"); // jumpAmt = 1000;
+                        Debugger.Break();
+                        jumpAmt = 1;
+                        ok = false;
+                    }
 
                 }
                 break;
@@ -177,7 +184,13 @@ namespace IntCode
                         jumpAmt = 4;
                     }
                     else
-                        throw new Exception("command error"); //jumpAmt = 1000;
+                    {
+                        //throw new Exception("command error"); //jumpAmt = 1000;
+                        Debugger.Break();
+                        jumpAmt = 1;
+                        ok = false;
+                    }
+
                 }
                 break;
 
@@ -352,7 +365,11 @@ namespace IntCode
                     if (ok)
                         ok = SetData(address, val);
                     else
-                        throw new Exception("parse failed: " + data[curr + paramOffset].ToString()); //
+                    {
+                        //  throw new Exception("parse failed: " + data[curr + paramOffset].ToString()); //
+                        ok = false;
+                        Debugger.Break();
+                    }
                     break;
                 }
 
@@ -394,13 +411,20 @@ namespace IntCode
                 ok = GetInput(curr + 1, modeParam1, out input1);
 
             if (!ok)
-                throw new Exception("parse error: " + (curr+1).ToString()); //
+            {
+                //  throw new Exception("parse error: " + (curr+1).ToString()); //
+                Debugger.Break();
+                return ok;
+            }
 
             if (ok && numParams >= 2)
             {
                 ok = GetInput(curr + 2, modeParam2, out input2);
                 if (!ok)
-                    throw new Exception("parse error: " + (curr + 2).ToString()); //
+                {
+                    //  throw new Exception("parse error: " + (curr + 2).ToString()); //
+                    Debugger.Break();
+                }
             }
 
             return ok;
@@ -428,24 +452,21 @@ namespace IntCode
                     }
 
                     if (ok)
-                        if (address < data.Length)
-                        {
-                            ok = Int64.TryParse(data[address], out val);
-                            ram[address] = val;
-                        }
+                        if (ram.ContainsKey(address))
+                            val = ram[address];
                         else
                         {
-                            if (ram.ContainsKey(address))
-                                val = ram[address];
+                            if (address < data.Length)
+                                ok = Int64.TryParse(data[address], out val);
                             else
-                            {
                                 val = 0;
-                                ram[address] = val;
-                            }
-
+                            ram[address] = val;
                         }
                     else
-                        throw new Exception("parse error: " + data[param]); //
+                    {
+                        //  throw new Exception("parse error: " + data[param]); //
+                        Debugger.Break();
+                    }
                     break;
                 }
 
@@ -453,7 +474,10 @@ namespace IntCode
                 {
                     ok = Int64.TryParse(data[param], out val);
                     if (!ok)
-                        throw new Exception("parse error: " + val); //
+                    {
+                        //throw new Exception("parse error: " + val); //
+                        Debugger.Break();
+                    }
                     break;
                 }
 
@@ -483,7 +507,10 @@ namespace IntCode
             if (ok)
                 ram[address] = ramVal;
             else
-                throw new Exception("parse error: " + val); //
+            {
+                //throw new Exception("parse error: " + val); //
+                Debugger.Break();
+            }
 
             return ok;
         }
@@ -539,6 +566,7 @@ namespace IntCode
         {
             this.Stop();
             this.ExternalOutput.Add("game over");
+            this.ExternalInput.Add("game over");
             return threaded.ThreadedResult();
         }
     }

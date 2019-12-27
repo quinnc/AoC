@@ -30,11 +30,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <StackPanel  Orientation="Vertical" Grid.Row="0" Grid.Column="0" KeyDown="Grid_KeyDown">
-                <Button Content="Left" Name="LeftButton" Height="50" Width="50" IsEnabled="False" Click="LeftButton_Click" />
-                <Button Content="Stay" Name="StayButton" Height="50" Width="50"  IsEnabled="False" Click="StayButton_Click" />
-                <Button Content="Right" Name="RightButton" Height="50" Width="50" IsEnabled="False" Click="RightButton_Click" />
+                <Button Content="Left" Name="LeftButton" Height="50" Width="50"  Click="LeftButton_Click" />
+                <!--IsEnabled="False"-->
+                <Button Content="Stay" Name="StayButton" Height="50" Width="50" Click="StayButton_Click" />
+                <Button Content="Right" Name="RightButton" Height="50" Width="50" Click="RightButton_Click" />
                 <TextBox Name="tbScore"  TextWrapping="Wrap" FontFamily="Courier New" Height="40" Width="100"/>
-                <Button Content="End Game" Name="EndButton" Height="50" Width="50" Click="EndButton_Click"  />
+                <Button Content="End Game" Name="EndButton" Height="50" Width="Auto" Click="EndButton_Click"  />
             </StackPanel>
             <TextBox Name="tbResult"  Grid.Column="1"
                  VerticalScrollBarVisibility="Visible"  TextWrapping="Wrap" FontFamily="Courier New" KeyDown="Grid_KeyDown"/>
