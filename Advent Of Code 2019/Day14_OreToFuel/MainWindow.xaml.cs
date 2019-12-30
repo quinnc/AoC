@@ -33,6 +33,10 @@ namespace Day14_OreToFuel
             //var numore = rl.OreToFuel();
             var numore = rl.OresForOneFuel();
             tbResult.Text = numore.ToString();
+            double totalOre = 1e12;
+            double totalFuel = totalOre / numore;
+
+            tbResult.Text += Environment.NewLine + totalFuel.ToString();
         }
     }
 }

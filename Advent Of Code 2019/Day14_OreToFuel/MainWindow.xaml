@@ -16,7 +16,8 @@
             <RowDefinition Height="0.5*" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="0" Grid.Row="0" Content="Chemical Reactions" />
+        <!-- <Label Grid.Column="0" Grid.Row="0" Content="Chemical Reactions" />-->
+        <TextBox Name="tbNumFuels" Grid.Column="0" Grid.Row="0" />
         <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" 
                  VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
 

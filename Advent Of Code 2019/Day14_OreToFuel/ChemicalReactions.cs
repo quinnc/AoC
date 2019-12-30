@@ -7,7 +7,7 @@ namespace Day14_OreToFuel
 {
     struct Chem
     {
-        public int Num;
+        public ulong Num;
         public string Name;
     }
 
@@ -15,6 +15,7 @@ namespace Day14_OreToFuel
     {
         readonly Dictionary<Chem, List<Chem>> reactions = new Dictionary<Chem, List<Chem>>();
 
+        ulong NumFuelsToMake { get; set; } = 1;
 
         private bool ParseReactionLine(string line)
         {
@@ -30,17 +31,17 @@ namespace Day14_OreToFuel
             foreach (var inChem in inputSplit)
             {
                 var inChemSplit = inChem.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                bool intConvOk = false;
+                bool ulongConvOk = false;
 
                 if (inChemSplit.Count() != 2)
                 {
                     return false;
                 }
 
-                int num;
-                intConvOk = Int32.TryParse(inChemSplit[0], out num);
+                ulong num;
+                ulongConvOk = UInt64.TryParse(inChemSplit[0], out num);
 
-                if (!intConvOk)
+                if (!ulongConvOk)
                     return false;
 
                 Chem chemIn = new Chem()
@@ -62,8 +63,8 @@ namespace Day14_OreToFuel
                 return false;
             }
 
-            int outCnt;
-            outConvOk = Int32.TryParse(outChemSplit[0], out outCnt);
+            ulong outCnt;
+            outConvOk = UInt64.TryParse(outChemSplit[0], out outCnt);
 
             if (!outConvOk)
                 return false;
@@ -92,7 +93,7 @@ namespace Day14_OreToFuel
             }
         }
 
-        public int OreToFuel()
+        public ulong OreToFuel()
         {
 
             Chem fuel = new Chem()
@@ -101,7 +102,7 @@ namespace Day14_OreToFuel
                 Num = 1
             };
 
-            int oreCount = 0;
+            ulong oreCount = 0;
 
             oreCount = GetOreCount(fuel, out _);
 
@@ -109,15 +110,15 @@ namespace Day14_OreToFuel
         }
 
 
-        public int OresForOneFuel()
+        public ulong OresForOneFuel()
         {
             Chem fuel = new Chem()
             {
                 Name = "FUEL",
-                Num = 1
+                Num = NumFuelsToMake,
             };
 
-            int oreCount = 0;
+            ulong oreCount = 0;
 
             List<Chem> needList = new List<Chem>();
             List<Chem> extrasList = new List<Chem>();
@@ -133,69 +134,56 @@ namespace Day14_OreToFuel
 
                 var recipe = reactions.First(x => x.Key.Name == componentToMake.Name);
 
-                foreach (var recipeComp in recipe.Value)
+                ulong needAmount = componentToMake.Num;
+                ulong recipeMakesAmount = recipe.Key.Num;
+
+                var extraMatch = extrasList.FirstOrDefault(x => x.Name == componentToMake.Name);
+                if (!string.IsNullOrEmpty(extraMatch.Name))
                 {
-                    if (recipeComp.Name == "ORE")
+                    extrasList.Remove(extraMatch);
+                    if (extraMatch.Num > componentToMake.Num)
                     {
-                        if (needList.Exists(x => x.Name == recipeComp.Name))
-                        {
-                            var exists = needList.First(x => x.Name == recipeComp.Name);
-                            needList.Remove(exists);
-                            exists.Num += recipeComp.Num;
-                            needList.Add(exists);
-                        }
-                        else
-                        {
-                            needList.Add(recipeComp);
-                        }
+                        extraMatch.Num -= componentToMake.Num;
+                        extrasList.Add(extraMatch);
                         continue;
                     }
-
-                    var extraMatch = extrasList.FirstOrDefault(x => x.Name == recipeComp.Name);
-                    if (extraMatch.Num > recipeComp.Num)
+                    else if (extraMatch.Num < componentToMake.Num)
                     {
-                        extrasList.Remove(extraMatch);
-                        extraMatch.Num -= recipeComp.Num;
-                        extrasList.Add(extraMatch);
+                        needAmount -= extraMatch.Num;
                     }
                     else
                     {
-                        // get the recipe and multiple it by the amount needed
-                        var recipeCompRecipe = reactions.First(x => x.Key.Name == recipeComp.Name);
-                        int neededOrigComp = recipeComp.Num - extraMatch.Num;
-
-                        extrasList.Remove(extraMatch);
-
-                        int multipliers = (int)(Math.Ceiling(neededOrigComp / (double)(recipeCompRecipe.Key.Num)));
-
-                        Chem extraComp = new Chem()
-                        {
-                            Name = recipeComp.Name,
-                            Num = (multipliers * recipeCompRecipe.Key.Num - neededOrigComp)
-                        };
-
-                        if (extraComp.Num > 0)
-                            extrasList.Add(extraComp);
-
-                        recipeCompRecipe.Value.ForEach(elem =>
-                        {
-                            if (needList.Exists(x => x.Name == elem.Name))
-                            {
-                                var exists = needList.First(x => x.Name == elem.Name);
-                                needList.Remove(exists);
-                                exists.Num += elem.Num;
-                                needList.Add(exists);
-                            }
-                            else
-                            {
-                                needList.Add(elem);
-                            }
-                        });
+                        // exactly the right amount so continue on
+                        continue;
                     }
-
                 }
 
-                // merge all the common values?
+                // need more of the current component.
+                ulong recipeMultiplier = (ulong)(Math.Ceiling((double)(needAmount) / (double)(recipeMakesAmount)));
+                ulong componentsMade = recipeMultiplier * recipe.Key.Num;
+
+                if (componentsMade > needAmount)
+                {
+                    Chem extraComp = new Chem()
+                    {
+                        Name = componentToMake.Name,
+                        Num = componentsMade - needAmount
+                    };
+
+                    // can't be any of these left in the extras at this poulong, so just add the new extras
+                    extrasList.Add(extraComp);
+                }
+
+                // now add each of the components in the recipe to the needs list
+                foreach (var recipeComp in recipe.Value)
+                {
+                    var exists = needList.FirstOrDefault(x => x.Name == recipeComp.Name);
+                    needList.Remove(exists);
+
+                    exists.Name = recipeComp.Name; // handle the situation where the default (empty Name, 0 Num) is returned
+                    exists.Num += recipeMultiplier * recipeComp.Num;
+                    needList.Add(exists);
+                }
 
                 if (needList.Count < 1)
                     break;
@@ -210,9 +198,9 @@ namespace Day14_OreToFuel
         }
 
 
-        private int GetOreCount(Chem outChem, out int chemsMade)
+        private ulong GetOreCount(Chem outChem, out ulong chemsMade)
         {
-            int oreCount = 0;
+            ulong oreCount = 0;
 
             var fuelRecipe = reactions.First(x => x.Key.Name == outChem.Name);
             chemsMade = fuelRecipe.Key.Num;
@@ -223,9 +211,9 @@ namespace Day14_OreToFuel
                     oreCount += inChem.Num;
                 else
                 {
-                    int chemCount;
-                    int oreToMakeInChem = GetOreCount(inChem, out chemCount);
-                    int multiplier = (int)Math.Ceiling(inChem.Num / (decimal)(chemCount));
+                    ulong chemCount;
+                    ulong oreToMakeInChem = GetOreCount(inChem, out chemCount);
+                    ulong multiplier = (ulong)Math.Ceiling(inChem.Num / (decimal)(chemCount));
 
                     oreCount += (multiplier * oreToMakeInChem);
 
