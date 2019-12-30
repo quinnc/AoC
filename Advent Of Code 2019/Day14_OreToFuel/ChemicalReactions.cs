@@ -15,7 +15,7 @@ namespace Day14_OreToFuel
     {
         readonly Dictionary<Chem, List<Chem>> reactions = new Dictionary<Chem, List<Chem>>();
 
-        ulong NumFuelsToMake { get; set; } = 1;
+        public ulong NumFuelsToMake { get; set; } = 1;
 
         private bool ParseReactionLine(string line)
         {
@@ -82,33 +82,21 @@ namespace Day14_OreToFuel
         }
 
 
-        public void ParseReactions(string _reactions)
+        public string Reactions
         {
-
-            reactions.Clear();
-            var lines = Regex.Split(_reactions, "\r\n|\r|\n");
-            foreach (var line in lines)
+            get => "";
+            set
             {
-                ParseReactionLine(line);
+                reactions.Clear();
+                var lines = Regex.Split(value, "\r\n|\r|\n");
+                foreach (var line in lines)
+                {
+                    ParseReactionLine(line);
+                }
             }
         }
 
-        public ulong OreToFuel()
-        {
-
-            Chem fuel = new Chem()
-            {
-                Name = "FUEL",
-                Num = 1
-            };
-
-            ulong oreCount = 0;
-
-            oreCount = GetOreCount(fuel, out _);
-
-            return oreCount;
-        }
-
+  
 
         public ulong OresForOneFuel()
         {
@@ -122,7 +110,6 @@ namespace Day14_OreToFuel
 
             List<Chem> needList = new List<Chem>();
             List<Chem> extrasList = new List<Chem>();
-            //Queue<Chem> madeList = new Queue<Chem>();
 
             needList.Add(fuel);
 
@@ -195,32 +182,6 @@ namespace Day14_OreToFuel
 
 
                 return oreCount;
-        }
-
-
-        private ulong GetOreCount(Chem outChem, out ulong chemsMade)
-        {
-            ulong oreCount = 0;
-
-            var fuelRecipe = reactions.First(x => x.Key.Name == outChem.Name);
-            chemsMade = fuelRecipe.Key.Num;
-
-            foreach (var inChem in fuelRecipe.Value)
-            {
-                if (inChem.Name == "ORE")
-                    oreCount += inChem.Num;
-                else
-                {
-                    ulong chemCount;
-                    ulong oreToMakeInChem = GetOreCount(inChem, out chemCount);
-                    ulong multiplier = (ulong)Math.Ceiling(inChem.Num / (decimal)(chemCount));
-
-                    oreCount += (multiplier * oreToMakeInChem);
-
-                }
-            }
-
-            return oreCount;
         }
 
     }

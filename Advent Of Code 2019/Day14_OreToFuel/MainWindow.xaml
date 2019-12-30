@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Day14_OreToFuel"
-        mc:Ignorable="d"
+        mc:Ignorable="d" d:DataContext="ChemicalReactions"
     Title="Day 14 Ore To Fuel Conversion" Height="1000" Width="2000">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -17,9 +17,9 @@
         </Grid.RowDefinitions>
 
         <!-- <Label Grid.Column="0" Grid.Row="0" Content="Chemical Reactions" />-->
-        <TextBox Name="tbNumFuels" Grid.Column="0" Grid.Row="0" />
+        <TextBox Name="tbNumFuels" Grid.Column="0" Grid.Row="0" Text="{Binding Path=NumFuelsToMake}"/>
         <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" 
-                 VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap"/>
+                 VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding Path=Reactions}"/>
 
         <StackPanel Grid.Column="0" Grid.Row="2" >
             <Button Content="Ore to get 1 fuel" Height="24" VerticalAlignment="Top" Click="Button_Click"/>

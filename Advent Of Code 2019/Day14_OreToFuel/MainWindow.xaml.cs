@@ -20,23 +20,25 @@ namespace Day14_OreToFuel
     /// </summary>
     public partial class MainWindow : Window
     {
+        ReactionList rl;
+
         public MainWindow()
         {
             InitializeComponent();
+            rl = new ReactionList();
+            this.DataContext = rl;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            ReactionList rl = new ReactionList();
-
-            rl.ParseReactions(tbCode.Text);
-            //var numore = rl.OreToFuel();
-            var numore = rl.OresForOneFuel();
-            tbResult.Text = numore.ToString();
+            var numOre = rl.OresForOneFuel();
+            tbResult.Text = numOre.ToString();
             double totalOre = 1e12;
-            double totalFuel = totalOre / numore;
+            double oreUsedRatio = totalOre / numOre;
 
-            tbResult.Text += Environment.NewLine + totalFuel.ToString();
+            tbResult.Text += Environment.NewLine + oreUsedRatio.ToString();
+
+            tbResult.Text += Environment.NewLine + (oreUsedRatio * rl.NumFuelsToMake).ToString();
         }
     }
 }
