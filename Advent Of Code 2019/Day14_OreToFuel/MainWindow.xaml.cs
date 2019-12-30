@@ -30,7 +30,8 @@ namespace Day14_OreToFuel
             ReactionList rl = new ReactionList();
 
             rl.ParseReactions(tbCode.Text);
-            var numore = rl.OreToFuel();
+            //var numore = rl.OreToFuel();
+            var numore = rl.OresForOneFuel();
             tbResult.Text = numore.ToString();
         }
     }
