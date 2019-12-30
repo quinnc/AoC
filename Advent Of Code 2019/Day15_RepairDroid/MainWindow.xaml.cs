@@ -25,16 +25,47 @@ namespace Day15_RepairDroid
             InitializeComponent();
         }
 
+        RepairDroidMapper rdm = null;
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            RepairDroidMapper rdm = new RepairDroidMapper(tbCode.Text);
+            rdm = new RepairDroidMapper(tbCode.Text);
             this.DataContext = rdm;
+            rdm.Code = tbCode.Text;
 
             rdm.Start();
 
             
             //rpm.Code = tbCode.Text;
 
+
+        }
+
+        private void TbResult_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (rdm == null)
+                return;
+
+            switch (e.Key)
+            {
+                case Key.Up:
+                    rdm.Walk(RepairDroidMapper.Direction.North);
+                    break;
+
+                case Key.Right:
+                    rdm.Walk(RepairDroidMapper.Direction.East);
+                    break;
+
+                case Key.Down:
+                    rdm.Walk(RepairDroidMapper.Direction.South);
+                    break;
+
+                case Key.Left:
+                    rdm.Walk(RepairDroidMapper.Direction.West);
+                    break;
+            }
+
+            e.Handled = true;
 
         }
     }

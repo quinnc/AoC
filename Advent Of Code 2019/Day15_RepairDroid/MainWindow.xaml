@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Day15_RepairDroid"
         mc:Ignorable="d"
     Title="Day 15 Repair Droid" Height="2000" Width="1000">
-    <Grid>
+    <Grid KeyDown="TbResult_KeyDown">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
@@ -19,15 +19,17 @@
         <!-- <Label Grid.Column="0" Grid.Row="0" Content="Chemical Reactions" />-->
         <TextBlock Name="tbNumFuels" Text="Droid code: " Grid.Column="0" Grid.Row="0"/>
         <TextBox Name="tbCode" Grid.Row="0" Grid.Column="1" 
-                 VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding Path=Code}"/>
+                 VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding Path=Code, Mode=OneWayToSource}"/>
 
         <StackPanel Grid.Column="0" Grid.Row="2" >
             <Button Content="Start mapping..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
             <!-- <Button Content="Find repeats..." Name="btnPart2" Height="24" VerticalAlignment="Top" Click="BtnPart2_Click" /> -->
         </StackPanel>
-        <TextBox Name="tbResult" Grid.Row="2" Grid.Column="1" IsEnabled="False" HorizontalScrollBarVisibility="Visible"
+        <!--<TextBox Name="tbResult" Grid.Row="2" Grid.Column="1" IsReadOnly="True" HorizontalScrollBarVisibility="Visible"
                  VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="NoWrap" FontFamily="Courier New"
-                 Text="{Binding Path=Map}"
-                 />
+                 Text="{Binding Path=Map,Mode=OneWay}" KeyDown="TbResult_KeyDown"/>-->
+
+        <TextBlock Name="tbResult" Grid.Row="2" Grid.Column="1" Focusable="True"  TextWrapping="NoWrap" FontFamily="Courier New"
+                 Text="{Binding Path=Map}" KeyDown="TbResult_KeyDown"/>
     </Grid>
 </Window>

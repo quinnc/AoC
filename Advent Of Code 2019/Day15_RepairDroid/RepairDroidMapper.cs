@@ -8,7 +8,7 @@ using TwodTypes;
 
 namespace Day15_RepairDroid
 {
-    internal class RepairDroidMapper: ViewModelBase
+    internal class RepairDroidMapper : ViewModelBase
     {
 
         // use sequential execution engine
@@ -28,10 +28,10 @@ namespace Day15_RepairDroid
         int minY = 0, maxY = 0;
 
         BlockingCollection<string> droidOutput = new BlockingCollection<string>();
-        
-       
 
-        public RepairDroidMapper ()
+
+
+        public RepairDroidMapper()
         {
             sectionMap.Add(new Location(0, 0), '.');
             repairDroid.ExternalOutput = droidOutput;
@@ -46,7 +46,7 @@ namespace Day15_RepairDroid
         }
 
 
-        public void Start ()
+        public void Start()
         {
             repairDroid.RunInThread();
         }
@@ -59,7 +59,7 @@ namespace Day15_RepairDroid
             East = 4
         }
 
-        public void Walk (Direction _dir)
+        public void Walk(Direction _dir)
         {
             repairDroid.ExternalInput.Add(((int)(_dir)).ToString());
 
@@ -70,7 +70,7 @@ namespace Day15_RepairDroid
                 case Direction.North:
                 {
                     attemptedY++;
-                    
+
                 }
                 break;
 
@@ -97,7 +97,7 @@ namespace Day15_RepairDroid
 
             // wait for reponse
             string _out = droidOutput.Take();
-            
+
             if (_out == "0")
             {
                 // hit a wall, so add wall to map, but don't move droid
@@ -133,7 +133,7 @@ namespace Day15_RepairDroid
                 else
                 {
                     sectionMap[attemptedLoc] = '$';
-                    
+
                 }
 
                 currX = attemptedX;
@@ -147,15 +147,19 @@ namespace Day15_RepairDroid
                 Debugger.Break();
             }
 
-            if (currX < minX) minX = currX;
-            if (currX > maxX) maxX = currX;
-            if (currY < minY) minY = currY;
-            if (currY > maxY) maxY = currY;
+            if (attemptedX < minX) minX = attemptedX;
+            if (attemptedX > maxX) maxX = attemptedX;
+            if (attemptedY < minY) minY = attemptedY;
+            if (attemptedY > maxY) maxY = attemptedY;
             RaisePropertyChanged(nameof(Map));
         }
 
         public string Map
         {
+            set
+            {
+                RaisePropertyChanged(nameof(Map));
+            }
             get
             {
                 string val = "";
@@ -168,22 +172,21 @@ namespace Day15_RepairDroid
 
                         if (sectionMap.ContainsKey(loc))
                         {
-                            if (y == currY)
-                                if (x == currX)
-                                    val += '[';
-                                else
-                                    val += ' ';
+                            if (x == currX && y == currY)
+                                val += '[';
+                            else
+                                val += ' ';
                             // else don't add space
                             val += sectionMap[loc];
-                            if (y == currY)
-                                if (x == currX)
-                                    val += ']';
-                                else
-                                    val += ' ';
+
+                            if (x == currX && y == currY)
+                                val += ']';
+                            else
+                                val += ' ';
                             // else don't add space
                         }
                         else
-                            val += ' ';
+                            val += "   ";
                     }
 
                     val += Environment.NewLine;
