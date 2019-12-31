@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using IntCode;
+using Overby.Collections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -33,14 +34,14 @@ namespace Day15_RepairDroid
 
         public RepairDroidMapper()
         {
-            sectionMap.Add(new Location(0, 0), '.');
+            sectionMap.Add(new Location(0, 0), '+');
             repairDroid.ExternalOutput = droidOutput;
             repairDroid.RunInThread();
         }
 
         public RepairDroidMapper(string _code)
         {
-            sectionMap.Add(new Location(0, 0), '.');
+            sectionMap.Add(new Location(0, 0), '+');
             repairDroid.ExternalOutput = droidOutput;
             Code = _code;
         }
@@ -51,12 +52,24 @@ namespace Day15_RepairDroid
             repairDroid.RunInThread();
         }
 
+        public void Stop()
+        {
+            repairDroid.Stop();
+        }
+
         public enum Direction
         {
             North = 1,
             South = 2,
             West = 3,
             East = 4
+        }
+
+        public enum Space
+        {
+            Home,
+            Hall,
+            Wall
         }
 
         public void Walk(Direction _dir)
@@ -70,7 +83,6 @@ namespace Day15_RepairDroid
                 case Direction.North:
                 {
                     attemptedY++;
-
                 }
                 break;
 
@@ -194,8 +206,157 @@ namespace Day15_RepairDroid
 
                 return val;
             }
-
         }
 
+        public void AutoSearch(out int distanceToHole)
+        {
+
+            currX = 0;
+            currY = 0;
+            distanceToHole = 0;
+            repairDroid.DefaultSleepTime = 0;
+
+            TreeNode<Space> searchRoot = new TreeNode<Space>(Space.Home);
+
+            distanceToHole = DepthFirstSearch(searchRoot, 0, 0);
+        }
+
+        private int DepthFirstSearch(TreeNode<Space> currNode, int _currX, int _currY)
+        {
+            int foundDepth = Int32.MaxValue;
+
+            foreach (var dir in Enum.GetValues(typeof(Direction)))
+            {
+
+                int attemptedX = _currX;
+                int attemptedY = _currY;
+                switch (dir)
+                {
+                    case Direction.North:
+                    {
+                        attemptedY++;
+                    }
+                    break;
+
+                    case Direction.South:
+                    {
+                        attemptedY--;
+                    }
+                    break;
+
+                    case Direction.East:
+                    {
+                        attemptedX++;
+                    }
+                    break;
+
+                    case Direction.West:
+                    {
+                        attemptedX--;
+                    }
+                    break;
+                }
+
+                Location attemptedLoc = new Location(attemptedX, attemptedY);
+
+                if (sectionMap.ContainsKey(attemptedLoc))
+                {
+                    // then already been here, could be loop or just going backwards
+                    continue;
+                }
+
+                // else ask the droid to move
+                repairDroid.ExternalInput.Add(((int)(dir)).ToString());
+                // wait for reponse
+                string _out = droidOutput.Take();
+
+                if (_out == "0")
+                {
+                    // hit a wall, so add wall to map, but don't move droid
+                    sectionMap[attemptedLoc] = '=';
+                    currNode.AddChild(Space.Wall);
+
+
+                    if (attemptedX < minX) minX = attemptedX;
+                    if (attemptedX > maxX) maxX = attemptedX;
+                    if (attemptedY < minY) minY = attemptedY;
+                    if (attemptedY > maxY) maxY = attemptedY;
+                    RaisePropertyChanged(nameof(Map));
+                }
+                else
+                {
+                    if (_out == "1")
+                    {
+                        // moved into open space
+                        sectionMap[attemptedLoc] = '.';
+                    }
+                    else if (_out == "2")
+                    {
+                        sectionMap[attemptedLoc] = '!';
+                    }
+                    else
+                    {
+                        Debugger.Break();
+                    }
+
+                    currX = attemptedX;
+                    currY = attemptedY;
+
+                    if (attemptedX < minX) minX = attemptedX;
+                    if (attemptedX > maxX) maxX = attemptedX;
+                    if (attemptedY < minY) minY = attemptedY;
+                    if (attemptedY > maxY) maxY = attemptedY;
+                    RaisePropertyChanged(nameof(Map));
+
+                    if (_out == "1")
+                    {
+                        var childnode = currNode.AddChild(Space.Hall);
+                        int a = DepthFirstSearch(childnode, attemptedX, attemptedY);
+                        if (a > 0 && a < foundDepth)
+                        {
+                            foundDepth = a;
+                            break;
+                        }
+                    }
+                    else if (_out == "2")
+                    {
+                        var childnode = currNode.AddChild(Space.Hall);
+                        if (childnode.Depth > 0 && childnode.Depth < foundDepth)
+                        {
+                            foundDepth = childnode.Depth;
+                            break;
+                        }
+                    }
+
+                    // finished searching that depth, now back up 
+                    int revDir = 0;
+                    switch (dir)
+                    {
+                        case Direction.North:
+                            revDir = (int)Direction.South;
+                            break;
+
+                        case Direction.South:
+                            revDir = (int)Direction.North;
+                            break;
+
+                        case Direction.East:
+                            revDir = (int)Direction.West;
+                            break;
+
+                        case Direction.West:
+                            revDir = (int)Direction.East;
+                            break;
+                    }
+
+                    repairDroid.ExternalInput.Add($"{revDir}");
+                    // wait for reponse
+                    droidOutput.Take();
+
+                }
+            }
+
+            return foundDepth;
+        }
     }
 }

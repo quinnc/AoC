@@ -13,5 +13,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Compiler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MathUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Threadify.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree.cs" />
   </ItemGroup>
 </Project>

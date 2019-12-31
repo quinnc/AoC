@@ -47,6 +47,8 @@ namespace IntCode
 
         protected bool _stop = false;
 
+        public int DefaultSleepTime { get; set; } = 10;
+
         public BlockingCollection<string> ExternalInput => externalInput;
 
         public BlockingCollection<string> ExternalOutput
@@ -79,11 +81,13 @@ namespace IntCode
 
             while (!_stop && execptr < szData && lastCommand != Commands.HALT)
             {
-                Thread.Sleep(1);
+                // need this sleep here for Breakout (aka pong) to work
+                Thread.Sleep(DefaultSleepTime);
                 ok = Command(execptr, out Int64 cmdSize, out lastCommand);
                 if (!ok)
                 {
-                    Debugger.Break();
+                    if (!_stop)
+                        Debugger.Break();
                     //throw new Exception($"command failed! position {execptr}");
                     break;
                 }
@@ -210,6 +214,8 @@ namespace IntCode
                     if (externalOutput == null)
                     {
                         Debugger.Break();
+                        jumpAmt = 2;
+                        break;
                     }
 
                     ok = GetInputs(curr, 1, modeParam1, out Int64 externalInt, modeParam2, out Int64 _);
@@ -368,7 +374,8 @@ namespace IntCode
                     {
                         //  throw new Exception("parse failed: " + data[curr + paramOffset].ToString()); //
                         ok = false;
-                        Debugger.Break();
+                        if (!_stop)
+                            Debugger.Break();
                     }
                     break;
                 }
@@ -509,7 +516,8 @@ namespace IntCode
             else
             {
                 //throw new Exception("parse error: " + val); //
-                Debugger.Break();
+                if (!_stop)
+                    Debugger.Break();
             }
 
             return ok;
@@ -562,12 +570,16 @@ namespace IntCode
             threaded.RunInThread();
         }
 
-        public bool EndThread()
+        public new bool Stop()
         {
-            this.Stop();
+            base.Stop();
             this.ExternalOutput.Add("game over");
             this.ExternalInput.Add("game over");
             return threaded.ThreadedResult();
+        }
+        public bool EndThread()
+        {
+            return this.Stop();
         }
     }
 }

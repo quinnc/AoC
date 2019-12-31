@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Day15_RepairDroid"
         mc:Ignorable="d"
-    Title="Day 15 Repair Droid" Height="2000" Width="1000">
+    Title="Day 15 Repair Droid" Height="2000" Width="1000" Closing="Window_Closing">
     <Grid KeyDown="TbResult_KeyDown">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -23,7 +23,7 @@
 
         <StackPanel Grid.Column="0" Grid.Row="2" >
             <Button Content="Start mapping..." Height="24" VerticalAlignment="Top" Click="Button_Click"/>
-            <!-- <Button Content="Find repeats..." Name="btnPart2" Height="24" VerticalAlignment="Top" Click="BtnPart2_Click" /> -->
+            <Button Content="Auto search" Name="btnPart2" Height="24" VerticalAlignment="Top" Click="BtnPart2_Click" />
         </StackPanel>
         <!--<TextBox Name="tbResult" Grid.Row="2" Grid.Column="1" IsReadOnly="True" HorizontalScrollBarVisibility="Visible"
                  VerticalScrollBarVisibility="Visible" AcceptsReturn="True" TextWrapping="NoWrap" FontFamily="Courier New"

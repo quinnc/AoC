@@ -34,11 +34,6 @@ namespace Day15_RepairDroid
             rdm.Code = tbCode.Text;
 
             rdm.Start();
-
-            
-            //rpm.Code = tbCode.Text;
-
-
         }
 
         private void TbResult_KeyDown(object sender, KeyEventArgs e)
@@ -67,6 +62,27 @@ namespace Day15_RepairDroid
 
             e.Handled = true;
 
+        }
+
+        private void BtnPart2_Click(object sender, RoutedEventArgs e)
+        {
+            rdm = new RepairDroidMapper(tbCode.Text);
+            this.DataContext = rdm;
+            rdm.Code = tbCode.Text;
+            rdm.Start();
+            rdm.AutoSearch(out int dist);
+
+            var t = tbResult.Text;
+
+            t += Environment.NewLine + $"Minimum steps to hole = {dist}";
+
+            tbResult.Text = t;
+
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            rdm?.Stop();
         }
     }
 }
