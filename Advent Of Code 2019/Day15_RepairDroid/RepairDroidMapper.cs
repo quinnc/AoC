@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using TwodTypes;
 
 namespace Day15_RepairDroid
@@ -69,7 +70,8 @@ namespace Day15_RepairDroid
         {
             Home,
             Hall,
-            Wall
+            Wall,
+            Hole
         }
 
         public void Walk(Direction _dir)
@@ -208,7 +210,7 @@ namespace Day15_RepairDroid
             }
         }
 
-        public void AutoSearch(out int distanceToHole)
+        public void AutoSearch(out int distanceToHole, out int longestPathFromHole)
         {
 
             currX = 0;
@@ -219,6 +221,54 @@ namespace Day15_RepairDroid
             TreeNode<Space> searchRoot = new TreeNode<Space>(Space.Home);
 
             distanceToHole = DepthFirstSearch(searchRoot, 0, 0);
+
+            longestPathFromHole = LongestPath(searchRoot);
+        }
+
+        public int LongestPath(TreeNode<Space> root)
+        {
+
+#if OLDCODE
+            List<int> depths = new List<int>();
+            var flatnodes = root.FlattenNode();
+
+            foreach (var n in flatnodes)
+            {
+                if (n.NumChildren == 0)
+                {
+                    depths.Add(n.Depth);
+                }
+            }
+
+            depths.Sort();
+            depths.Reverse();
+
+            if (depths[0] == distanceToHole)
+                longestOtherPath = depths[1];
+            else
+                longestOtherPath = depths[0];
+#endif
+
+            int maxpath = 0;
+            object lockingVar = new object();
+
+
+            Parallel.ForEach(root.Children, c =>
+                {
+                    if (c.Find(Space.Hole) == null)
+                    {
+                        int childMaxPath = 0;
+                        c.MaxPath(ref childMaxPath);
+
+                        lock (lockingVar)
+                        {
+                            if (childMaxPath > maxpath)
+                                maxpath = childMaxPath;
+                        }
+                    }
+                });
+
+            return maxpath;
         }
 
         private int DepthFirstSearch(TreeNode<Space> currNode, int _currX, int _currY)
@@ -315,16 +365,16 @@ namespace Day15_RepairDroid
                         if (a > 0 && a < foundDepth)
                         {
                             foundDepth = a;
-                            break;
+                            //break;
                         }
                     }
                     else if (_out == "2")
                     {
-                        var childnode = currNode.AddChild(Space.Hall);
+                        var childnode = currNode.AddChild(Space.Hole);
                         if (childnode.Depth > 0 && childnode.Depth < foundDepth)
                         {
                             foundDepth = childnode.Depth;
-                            break;
+                            //break;
                         }
                     }
 

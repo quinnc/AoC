@@ -70,11 +70,11 @@ namespace Day15_RepairDroid
             this.DataContext = rdm;
             rdm.Code = tbCode.Text;
             rdm.Start();
-            rdm.AutoSearch(out int dist);
+            rdm.AutoSearch(out int dist, out int other);
 
             var t = tbResult.Text;
 
-            t += Environment.NewLine + $"Minimum steps to hole = {dist}";
+            t += Environment.NewLine + $"Minimum steps to hole = {dist}, furthest distance to another deadend {other}.";
 
             tbResult.Text = t;
 

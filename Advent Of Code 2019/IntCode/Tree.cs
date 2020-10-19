@@ -61,6 +61,53 @@ namespace Overby.Collections
         {
             return new[] { Value }.Concat(_children.SelectMany(x => x.Flatten()));
         }
+
+        public IEnumerable<TreeNode<T>> FlattenNode()
+        {
+            var l = new List<TreeNode<T>> { this };
+            
+            //.AddRange(this._children.ForEach(x => x.Flatten()));
+            foreach (var c in _children)
+            {
+                l.AddRange(c.FlattenNode());
+            }
+
+            return l;
+        }
+
+        public int NumChildren => _children.Count;
+
+        public TreeNode<T> Find (T val)
+        {
+            if (_value.Equals(val))
+                return this;
+
+            foreach (var c in Children)
+            {
+                var f = c.Find(val);
+                if (f != null)
+                    return f;
+            }
+
+            return null;
+        }
+
+        public void MaxPath (ref int dist)
+        {
+            // if no children, then done
+            if (_children.Count == 0)
+                return;
+
+            int savedDist = dist;
+
+            foreach (var c in _children)
+            {
+                int childDist = savedDist + 1;
+                c.MaxPath(ref childDist);
+                if (childDist > dist)
+                    dist = childDist;
+            }
+        }
     }
 }
 
